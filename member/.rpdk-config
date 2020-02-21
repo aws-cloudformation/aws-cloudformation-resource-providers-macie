@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::Member",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.member.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.member.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "member"
+        ]
+    }
+}

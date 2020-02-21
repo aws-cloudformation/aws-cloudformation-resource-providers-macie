@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::ClassificationExportConfiguration",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.classificationexportconfiguration.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.classificationexportconfiguration.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "classificationexportconfiguration"
+        ]
+    }
+}

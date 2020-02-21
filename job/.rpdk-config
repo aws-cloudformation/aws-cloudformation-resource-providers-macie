@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::ClassificationJob",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.classificationjob.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.classificationjob.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "classificationjob"
+        ]
+    }
+}

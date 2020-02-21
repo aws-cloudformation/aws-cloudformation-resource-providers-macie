@@ -1,0 +1,41 @@
+{
+  "typeName": "AWS::Macie::Master",
+  "description": "You can use the AWS::Macie::Master resource in a Macie member account to accept an invitation from a Macie master account. The invitation to the member account must be sent prior to using the AWS::Macie::Master resource to accept the master account's invitation. You can invite a member account by using the InviteMembers operation of the Amazon Macie API, or by creating an AWS::Macie::Member resource.",
+  "properties": {
+    "status": {
+      "description": "A enumeration value that specifies the status of the Macie Session. Valid values are: ENABLED | DISABLED",
+      "type": "string"
+    },
+    "findingPublishingFrequency": {
+      "description": "A enumeration value that specifies how frequently finding updates are published. Valid values include: FIFTEEN_MINUTES | ONE_HOUR | SIX_HOURS. The default value is SIX_HOURS.",
+      "type": "string"
+    },
+    "macieId": {
+      "description": "Unique identifier of the Macie session",
+      "type": "string"
+    },
+    "serviceRole": {
+      "description": "ARN of the service linked role for Macie",
+      "type": "string"
+    },
+    "createdAt": {
+      "description": "Timestamp of the date ",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "Unique identifier of the Macie session",
+      "type": "string"
+    }
+  },
+  "primaryIdentifier": [
+    "macieId"
+  ],
+  "readOnlyProperties": [
+    "/properties/macieId",
+    "/properties/serviceRole",
+    "/properties/createdAt",
+    "/properties/updatedAt"
+  ],
+  "additionalProperties": false,
+  "handlers": {}
+}

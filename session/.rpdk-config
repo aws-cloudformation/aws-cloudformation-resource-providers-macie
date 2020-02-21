@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::Session",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.session.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.session.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "session"
+        ]
+    }
+}

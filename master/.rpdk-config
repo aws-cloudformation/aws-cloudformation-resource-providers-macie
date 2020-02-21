@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::Master",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.master.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.master.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "master"
+        ]
+    }
+}

@@ -1,0 +1,61 @@
+{
+  "typeName": "AWS::Macie::Member",
+  "description": "You can use the AWS::Macie::Member resource to add an AWS account as a Macie member account to the current Macie master account. If the value of the Status property is not provided or is set to Created, a member account is created but not invited. If the value of the Status property is set to Invited, a member account is created and invited. A AWS::Macie::Member resource must be created with the Status property set to Invited before the AWS::Macie::Master resource can be created in a Macie member account.",
+  "properties": {
+    "message": {
+      "description": "The message to include with the invitation sent to the member accounts.",
+      "type": "string"
+    },
+    "memberId": {
+      "description": "The AWS account ID of the account to designate as a member.",
+      "type": "string"
+    },
+    "email": {
+      "description": "The email address associated with the member account.",
+      "type": "string"
+    },
+    "disableEmailNotification": {
+      "description": "Specifies whether or not to disable email notification for the member account that you invite.",
+      "type": "boolean"
+    },
+    "status": {
+      "description": "You can use the Status property to update the status of the relationship between the member account and its master account. Valid values are Created and Invited when using a AWS::Macie::Member resource. If the value for this property is not provided or set to Created, a member account is created but not invited. If the value of this property is set to Invited, a member account is created and invited.",
+      "type": "string"
+    }
+  },
+  "primaryIdentifier": [
+    "memberId"
+  ],
+  "readOnlyProperties": [
+    "/properties/macieId",
+    "/properties/serviceRole",
+    "/properties/createdAt",
+    "/properties/updatedAt"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "macie2:InviteMembers",
+        "macie2:CreateMembers"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie2:ListInvitations",
+        "macie2:ListMembers"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "macie2:DeleteInvitations",
+        "macie2:DeleteMembers"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "macie2:ListMembers"
+      ]
+    }
+  }
+}

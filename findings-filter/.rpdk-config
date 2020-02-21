@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::FindingsFilter",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.findingsfilter.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.findingsfilter.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "findingsfilter"
+        ]
+    }
+}
