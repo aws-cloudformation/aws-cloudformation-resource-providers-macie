@@ -2,62 +2,34 @@
   "typeName": "AWS::Macie::CustomDataIdentifier",
   "description": "The AWS::Macie::CustomDataIdentifier resource specifies a new CustomDataIdentifier. A CustomDataIdentifier allows users to detect data matching specific criteria in their ClassificationJob.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-  "definitions": {
-    "InitechDateFormat": {
-      "$comment": "Use the `definitions` block to provide shared resource property schemas",
-      "type": "string",
-      "format": "date-time"
-    },
-    "Memo": {
-      "type": "object",
-      "properties": {
-        "Heading": {
-          "type": "string"
-        },
-        "Body": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    }
-  },
   "properties": {
-    "TPSCode": {
-      "description": "A TPS Code is automatically generated on creation and assigned as the unique identifier.",
-      "type": "string",
-      "pattern": "^[A-Z]{3,5}[0-9]{8}-[0-9]{4}$"
+    "Name": {
+      "description": "Name of the CustomDataIdentifier.",
+      "type": "string"
     },
-    "Title": {
+    "Description": {
+      "description": "Description of the CustomDataIdentifier.",
+      "type": "string"
+    },
+    "CustomDataIdentifierId": {
+      "description": "Unique identifier of the CustomDataIdentifier",
+      "type": "string"
+    },
+    "Regex": {
       "description": "The title of the TPS report is a mandatory element.",
-      "type": "string",
-      "minLength": 20,
-      "maxLength": 250
+      "type": "string"
     },
-    "CoverSheetIncluded": {
+    "MaximumMatchDistance": {
       "description": "Required for all TPS Reports submitted after 2/19/1999",
-      "type": "boolean"
+      "type": "integer"
     },
-    "DueDate": {
-      "$ref": "#/definitions/InitechDateFormat"
+    "Keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
-    "ApprovalDate": {
-      "$ref": "#/definitions/InitechDateFormat"
-    },
-    "Memo": {
-      "$ref": "#/definitions/Memo"
-    },
-    "SecondCopyOfMemo": {
-      "description": "In case you didn't get the first one.",
-      "$ref": "#/definitions/Memo"
-    },
-    "TestCode": {
-      "type": "string",
-      "enum": [
-        "NOT_STARTED",
-        "CANCELLED"
-      ]
-    },
-    "Authors": {
+    "IgnoreList": {
       "type": "array",
       "items": {
         "type": "string"
@@ -66,39 +38,35 @@
   },
   "additionalProperties": false,
   "required": [
-    "TestCode",
+    "Name",
     "Title"
   ],
   "readOnlyProperties": [
-    "/properties/TPSCode"
+    "/properties/CustomDataIdentifierId"
   ],
   "primaryIdentifier": [
-    "/properties/TPSCode"
+    "/properties/CustomDataIdentifierId"
   ],
   "handlers": {
     "create": {
       "permissions": [
-        "initech:CreateReport"
+        "macie2:CreateCustomDataIdentifier"
       ]
     },
     "read": {
       "permissions": [
-        "initech:DescribeReport"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "initech:UpdateReport"
+        "macie2:GetCustomDataIdentifiers"
       ]
     },
     "delete": {
       "permissions": [
-        "initech:DeleteReport"
+        "initech:DeleteCustomDataIdentifier"
       ]
     },
     "list": {
       "permissions": [
-        "initech:ListReports"
+        "macie2:ListCustomDataIdentifiers",
+        "macie2:GetCustomDataIdentifiers"
       ]
     }
   }

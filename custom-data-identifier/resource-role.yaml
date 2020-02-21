@@ -23,11 +23,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "initech:DeleteCustomDataIdentifier"
+                - "macie2:CreateCustomDataIdentifier"
+                - "macie2:GetCustomDataIdentifiers"
+                - "macie2:ListCustomDataIdentifiers"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
