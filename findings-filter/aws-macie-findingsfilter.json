@@ -1,0 +1,103 @@
+{
+  "typeName": "AWS::Macie::FindingsFilter",
+  "description": "The AWS::Macie::FindingsFilter resource specifies a new filter defined by the provided findingCriteria.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Condition": {
+      "description": "Specifies the condition to apply to a single field when filtering through Macie findings.",
+      "type": "object",
+      "properties": {
+        "Eq": {
+          "type": "string"
+        },
+        "Gte": {
+          "type": "integer"
+        },
+        "Lt": {
+          "type": "integer"
+        },
+        "Lte": {
+          "type": "integer"
+        },
+        "Neq": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FindingCriteria": {
+      "description": "Represents a map of finding properties that match specified conditions and values when querying findings.",
+      "type": "object",
+      "properties": {
+        "Criterion": {
+          "type": "string",
+          "format": "json-pointer"
+        },
+        "ItemType": {
+          "$ref": "#/definitions/Condition"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Action": {
+      "description": "Specifies the action that is to be applied to the findings that match the filter.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "The description of the filter.",
+      "type": "string"
+    },
+    "FindingCriteria": {
+      "description": "Represents the criteria to be used in the filter for querying findings.",
+      "$ref": "#/definitions/FindingCriteria"
+    },
+    "Name": {
+      "description": "The name of the filter.",
+      "type": "string"
+    },
+    "Rank": {
+      "description": "Specifies the position of the filter in the list of current filters. Also specifies the order in which this filter is applied to the findings.",
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "FindingCriteria",
+    "Rank",
+    "Description",
+    "Action"
+  ],
+  "primaryIdentifier": [
+    "?"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "macie2:CreateFindingsFilter"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie2:GetFindingsFilter"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "macie2:UpdateFindingsFilter"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "macie2:DeleteFindingsFilter"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "macie2:ListFindingsFilter"
+      ]
+    }
+  }
+}
