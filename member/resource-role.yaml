@@ -23,11 +23,12 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "macie2:CreateMembers"
+                - "macie2:DeleteInvitations"
+                - "macie2:DeleteMembers"
+                - "macie2:InviteMembers"
+                - "macie2:ListInvitations"
+                - "macie2:ListMembers"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

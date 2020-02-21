@@ -23,11 +23,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "macie2:AcceptInvitation"
+                - "macie2:DisassociateFromMasterAccount"
+                - "macie2:GetMasterAccount"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

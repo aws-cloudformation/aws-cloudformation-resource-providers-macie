@@ -26,12 +26,6 @@
   "primaryIdentifier": [
     "memberId"
   ],
-  "readOnlyProperties": [
-    "/properties/macieId",
-    "/properties/serviceRole",
-    "/properties/createdAt",
-    "/properties/updatedAt"
-  ],
   "additionalProperties": false,
   "handlers": {
     "create": {
