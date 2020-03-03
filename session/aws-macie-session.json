@@ -28,7 +28,7 @@
     }
   },
   "primaryIdentifier": [
-    "properties/macieId"
+    "/properties/macieId"
   ],
   "readOnlyProperties": [
     "/properties/macieId",
