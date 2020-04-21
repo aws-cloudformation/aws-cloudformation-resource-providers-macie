@@ -67,7 +67,7 @@
     },
     "list": {
       "permissions": [
-        "macie2:ListCustomDataIdentifier"
+        "macie2:ListCustomDataIdentifiers"
       ]
     },
     "read": {

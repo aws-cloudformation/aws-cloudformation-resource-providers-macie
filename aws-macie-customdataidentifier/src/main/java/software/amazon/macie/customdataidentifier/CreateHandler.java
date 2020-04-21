@@ -27,41 +27,52 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
 
         final ResourceModel model = request.getDesiredResourceState();
 
-        return createCustomDataIdentifier(model);
-    }
-
-    private ProgressEvent<ResourceModel, CallbackContext> createCustomDataIdentifier(ResourceModel model) {
         final Macie2Client client = Macie2Client.builder().build();
-        ProgressEventBuilder<ResourceModel, CallbackContext> progressEventBuilder = ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model);
-        ListCustomDataIdentifiersRequest request = ListCustomDataIdentifiersRequest.builder()
-            .maxResults(MAX_LIST_RESULTS)
-            .build();
-        ListCustomDataIdentifiersResponse response = client.listCustomDataIdentifiers(request);
-        Optional<CustomDataIdentifierSummary> existingCustomDataIdentifier = response.items().stream()
-            .filter(customDataIdentifierSummary -> customDataIdentifierSummary.name().equalsIgnoreCase(model.getName()))
-            .findAny();
-        existingCustomDataIdentifier.ifPresentOrElse(
-            customDataIdentifierSummary -> progressEventBuilder.status(OperationStatus.FAILED)
-                .errorCode(HandlerErrorCode.AlreadyExists)
-                .callbackContext(CallbackContext.builder().build()),
-            () -> progressEventBuilder.status(OperationStatus.SUCCESS)
-                .callbackContext(CallbackContext.builder()
-                    .customDataIdentifierId(client.createCustomDataIdentifier(buildRequest(model)).customDataIdentifierId())
-                    .customDataIdentifierName()
-                    .build()));
+        ProgressEventBuilder<ResourceModel, CallbackContext> progressEventBuilder
+                = ProgressEvent.<ResourceModel, CallbackContext>builder().resourceModel(model);
+
+        ListCustomDataIdentifiersRequest listCustomDataIdentifiersRequest
+                = ListCustomDataIdentifiersRequest.builder()
+                                                 .maxResults(MAX_LIST_RESULTS)
+                                                 .build();
+
+        ListCustomDataIdentifiersResponse listCustomDataIdentifiersResponse
+                = client.listCustomDataIdentifiers(listCustomDataIdentifiersRequest);
+
+        Optional<CustomDataIdentifierSummary> existingCustomDataIdentifier
+                = listCustomDataIdentifiersResponse.items()
+                                                  .stream()
+                                                  .filter(summary -> summary.name().equalsIgnoreCase(model.getName()))
+                                                  .findAny();
+
+        if (existingCustomDataIdentifier.isPresent()) {
+            progressEventBuilder.status(OperationStatus.FAILED)
+                                .errorCode(HandlerErrorCode.AlreadyExists)
+                                .callbackContext(CallbackContext.builder().build());
+        } else {
+            progressEventBuilder.status(OperationStatus.SUCCESS)
+                                .callbackContext(CallbackContext.builder()
+                                                                .customDataIdentifierId(
+                                                                        client.createCustomDataIdentifier(
+                                                                                  buildRequest(request, model))
+                                                                              .customDataIdentifierId())
+                                                                .build());
+        }
+
         return progressEventBuilder.build();
     }
 
-    private CreateCustomDataIdentifierRequest buildRequest(ResourceModel model) {
+    private CreateCustomDataIdentifierRequest buildRequest(
+            ResourceHandlerRequest<ResourceModel> request,
+            ResourceModel model) {
         return CreateCustomDataIdentifierRequest.builder()
-            .name(model.getName())
-            .clientToken(model.getClientToken())
-            .description(model.getDescription())
-            .ignoreWords(model.getIgnoreWords())
-            .keywords(model.getKeywords())
-            .maximumMatchDistance(model.getMaximumMatchDistance())
-            .regex(model.getRegex())
-            .build();
+                                               .clientToken(request.getClientRequestToken())
+                                               .name(model.getName())
+                                               .description(model.getDescription())
+                                               .ignoreWords(model.getIgnoreWords())
+                                               .keywords(model.getKeywords())
+                                               .maximumMatchDistance(model.getMaximumMatchDistance())
+                                               .regex(model.getRegex())
+                                               .build();
     }
 }

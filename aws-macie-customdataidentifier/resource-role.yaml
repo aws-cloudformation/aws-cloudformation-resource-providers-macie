@@ -26,7 +26,7 @@ Resources:
                 - "macie2:CreateCustomDataIdentifier"
                 - "macie2:DeleteCustomDataIdentifier"
                 - "macie2:GetCustomDataIdentifier"
-                - "macie2:ListCustomDataIdentifier"
+                - "macie2:ListCustomDataIdentifiers"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
