@@ -1,0 +1,79 @@
+{
+  "typeName": "AWS::Macie::CustomDataIdentifier",
+  "description": "Macie CustomDataIdentifier resource schema",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "Name": {
+      "description": "Name of custom data identifier.",
+      "type": "string"
+    },
+    "ResourceId": {
+      "description": "Resource ID for custom data identifier.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "The description of custom data identifier.",
+      "type": "string"
+    },
+    "Regex": {
+      "description": "Regular expression for custom data identifier.",
+      "type": "string"
+    },
+    "MaximumMatchDistance": {
+      "description": "Maximum match distance",
+      "type": "integer"
+    },
+    "Keywords": {
+      "description": "Keywords",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "IgnoreWords": {
+      "description": "Words to be ignored",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Name",
+    "/properties/ResourceId",
+    "/properties/Description",
+    "/properties/Regex",
+    "/properties/MaximumMatchDistance",
+    "/properties/Keywords",
+    "/properties/IgnoreWords"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "macie2:CreateCustomDataIdentifier"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "macie2:DeleteCustomDataIdentifier"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "macie2:ListCustomDataIdentifier"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie2:GetCustomDataIdentifier"
+      ]
+    }
+  }
+}

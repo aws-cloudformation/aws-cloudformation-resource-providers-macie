@@ -1,0 +1,15 @@
+{
+    "typeName": "AWS::Macie::CustomDataIdentifier",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.macie.customdataidentifier.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.macie.customdataidentifier.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "macie",
+            "customdataidentifier"
+        ]
+    }
+}
