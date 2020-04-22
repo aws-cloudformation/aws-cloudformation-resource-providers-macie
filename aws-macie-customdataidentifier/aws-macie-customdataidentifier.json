@@ -12,6 +12,7 @@
       "type": "string"
     },
     "Description": {
+
       "description": "Description of custom data identifier.",
       "type": "string"
     },
@@ -20,17 +21,20 @@
       "type": "string"
     },
     "MaximumMatchDistance": {
+
       "description": "Maximum match distance.",
       "type": "integer"
     },
     "Keywords": {
       "description": "Keywords to be matched against.",
+
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "IgnoreWords": {
+
       "description": "Words to be ignored.",
       "type": "array",
       "items": {
@@ -53,6 +57,7 @@
     "Deleted": {
       "description": "Whether the customer data identifier has been deleted.",
       "type": "boolean"
+
     }
   },
   "additionalProperties": false,
