@@ -1,0 +1,109 @@
+{
+  "typeName": "AWS::Macie::FindingsFilter",
+  "description": "Macie FindingsFilter resource schema.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Criterion": {
+      "type": "object",
+      "properties": {
+        "Gt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Gte": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Lt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Lte": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Eq": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Neq": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FindingCriteria": {
+      "type": "object",
+      "properties": {
+        "criterion": {
+          "$ref": "#/definitions/Criterion"
+        }
+      }
+    },
+    "FindingFilterAction": {
+      "type": "string",
+      "enum": [
+        "ARCHIVE",
+        "NOOP"
+      ]
+    }
+  },
+  "properties": {
+    "Name": {
+      "type": "string"
+    },
+    "Description": {
+      "type": "string"
+    },
+    "FindingCriteria": {
+      "$ref": "#/definitions/FindingCriteria"
+    },
+    "Action": {
+      "$ref": "#/definitions/FindingFilterAction"
+    },
+    "Position": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "/properties/Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "macie:CreateFindingsFilter"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie:DescribeFindingsFilter"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "macie:UpdateFindingsFilter"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "macie:DeleteFindingsFilter"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "macie:ListFindingsFilters"
+      ]
+    }
+  }
+}

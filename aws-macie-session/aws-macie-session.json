@@ -1,0 +1,53 @@
+{
+  "typeName": "AWS::Macie::Session",
+  "description": "The AWS::Macie::Session resource specifies a new Amazon Macie session. A session is an object that represents the Amazon Macie service. A session is required for Amazon Macie to become operational.",
+  "properties": {
+    "Status": {
+      "description": "A enumeration value that specifies the status of the Macie Session.",
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "PAUSED"
+      ]
+    },
+    "FindingPublishingFrequency": {
+      "description": "A enumeration value that specifies how frequently finding updates are published.",
+      "type": "string",
+      "enum": [
+        "FIFTEEN_MINUTES",
+        "ONE_HOUR",
+        "SIX_HOURS"
+      ],
+      "default": "SIX_HOURS"
+    }
+  },
+  "primaryIdentifier": [
+    "/properties/Status"
+  ],
+  "readOnlyProperties": [
+    "/properties/Status"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "macie2:EnableMacie"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie2:GetMacieSession"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "macie2:UpdateMacieSession"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "macie2:DisableMacie"
+      ]
+    }
+  }
+}
