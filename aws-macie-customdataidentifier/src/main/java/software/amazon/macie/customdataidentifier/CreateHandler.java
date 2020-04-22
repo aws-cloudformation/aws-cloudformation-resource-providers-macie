@@ -59,6 +59,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                                                                              .customDataIdentifierId())
                                                                 .build()
                                 );
+
         }
 
         return progressEventBuilder.build();
