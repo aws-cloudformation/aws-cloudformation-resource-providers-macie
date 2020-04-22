@@ -1,8 +1,8 @@
-package software.amazon.macie.session;
+package software.amazon.macie.customdataidentifier;
 
 import software.amazon.awssdk.services.macie2.Macie2Client;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionResponse;
+import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierRequest;
+import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierResponse;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -26,30 +26,37 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
         this.proxy = proxy;
         this.client = ClientBuilder.getClient();
 
-        final ResourceModel model = getMacieSession();
+        final ResourceModel model = getCustomDataIdentifier(request.getDesiredResourceState());
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model)
-            .status(OperationStatus.SUCCESS)
-            .build();
+                .resourceModel(model)
+                .status(OperationStatus.SUCCESS)
+                .build();
+
     }
 
-    private ResourceModel getMacieSession() {
-        final GetMacieSessionRequest request = GetMacieSessionRequest.builder().build();
-        final GetMacieSessionResponse response;
+    private ResourceModel getCustomDataIdentifier(ResourceModel model) {
+        final GetCustomDataIdentifierRequest request = GetCustomDataIdentifierRequest.builder().id(model.getId()).build();
+        final GetCustomDataIdentifierResponse response;
 
         try {
-            response = proxy.injectCredentialsAndInvokeV2(request, client::getMacieSession);
+            response = proxy.injectCredentialsAndInvokeV2(request, client::getCustomDataIdentifier);
         } catch (final Macie2Exception e) {
             throw new CfnAccessDeniedException(ResourceModel.TYPE_NAME);
         }
 
         return ResourceModel.builder()
-                            .status(response.statusAsString())
-                            .findingPublishingFrequency(response.findingPublishingFrequencyAsString())
-                            .serviceRole(response.serviceRole())
+                            .arn(response.arn())
+                            .id(response.id())
+                            .name(response.name())
+                            .description(response.description())
+                            .regex(response.regex())
+                            .keywords(response.keywords())
+                            .ignoreWords(response.ignoreWords())
+                            .maximumMatchDistance(response.maximumMatchDistance())
+                            .deleted(response.deleted())
                             .createdAt(response.createdAt().toString())
-                            .updatedAt(response.updatedAt().toString())
                             .build();
     }
+
 }

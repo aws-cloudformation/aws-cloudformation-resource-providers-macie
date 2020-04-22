@@ -1,5 +1,10 @@
 package software.amazon.macie.customdataidentifier;
 
+import org.mockito.ArgumentMatchers;
+import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierRequest;
+import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierResponse;
+import software.amazon.awssdk.services.macie2.model.ListCustomDataIdentifiersRequest;
+import software.amazon.awssdk.services.macie2.model.ListCustomDataIdentifiersResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -12,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +41,14 @@ public class CreateHandlerTest {
 
         final ResourceModel model = ResourceModel.builder().build();
 
+        doReturn(ListCustomDataIdentifiersResponse.builder().build())
+                .when(proxy).injectCredentialsAndInvokeV2(ArgumentMatchers.any(ListCustomDataIdentifiersRequest.class),
+                                                          ArgumentMatchers.any());
+
+        doReturn(CreateCustomDataIdentifierResponse.builder().customDataIdentifierId("1234").build())
+                .when(proxy).injectCredentialsAndInvokeV2(ArgumentMatchers.any(CreateCustomDataIdentifierRequest.class),
+                                                          ArgumentMatchers.any());
+
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
             .build();
@@ -44,7 +58,7 @@ public class CreateHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
-        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackContext()).isEqualTo(CallbackContext.builder().customDataIdentifierId("1234").build());
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();

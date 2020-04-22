@@ -19,13 +19,29 @@
         "SIX_HOURS"
       ],
       "default": "SIX_HOURS"
+    },
+    "ServiceRole": {
+      "description": "The service-linked role.",
+      "type": "string"
+    },
+    "CreatedAt": {
+      "description": "Date-time at which the custom data identifier was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "UpdatedAt": {
+      "description": "Date-time at which the custom data identifier was last updated.",
+      "type": "string",
+      "format": "date-time"
     }
   },
   "primaryIdentifier": [
-    "/properties/Status"
+    "/properties/ServiceRole"
   ],
   "readOnlyProperties": [
-    "/properties/Status"
+    "/properties/ServiceRole",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt"
   ],
   "additionalProperties": false,
   "handlers": {
