@@ -18,3 +18,8 @@ target/
 
 # our logs
 rpdk.log
+
+# other ignores
+build/
+docs/
+*.zip

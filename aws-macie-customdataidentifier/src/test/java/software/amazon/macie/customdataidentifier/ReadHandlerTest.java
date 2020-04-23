@@ -1,6 +1,5 @@
 package software.amazon.macie.customdataidentifier;
 
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
