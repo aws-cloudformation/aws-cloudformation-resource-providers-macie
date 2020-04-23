@@ -2,20 +2,15 @@ package software.amazon.macie.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
@@ -40,8 +35,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 public class UpdateHandlerTest {
 
     protected static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
-    private static final String MACIE_NOT_ENABLED_MESSAGE
-        = "An error occurred (AccessDeniedException) when calling the GetMacieSession operation: Macie is not enabled";
+    private static final String MACIE_NOT_ENABLED_MESSAGE = "Macie is not enabled";
+    private static final String MACIE_NOT_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private static final String MACIE_NOT_ENABLED_CODE = "403";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/SERVICE-ROLE-NAME";
     private static final String TEST_ACCOUNT_ID = "999999999999";
@@ -60,30 +55,8 @@ public class UpdateHandlerTest {
     @BeforeEach
     public void setup() {
         handler = new UpdateHandler();
-        macie2 = mock(Macie2Client.class);
         logger = new LoggerProxy();
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
-        proxyMacie2Client = new ProxyClient<Macie2Client>() {
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            ResponseT
-            injectCredentialsAndInvokeV2(RequestT request, Function<RequestT, ResponseT> requestFunction) {
-                return proxy.injectCredentialsAndInvokeV2(request, requestFunction);
-            }
-
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            CompletableFuture<ResponseT>
-            injectCredentialsAndInvokeV2Aync(RequestT request,
-                Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public Macie2Client client() {
-                return macie2;
-            }
-        };
     }
 
     @Test
@@ -95,11 +68,15 @@ public class UpdateHandlerTest {
             .updatedAt(Instant.now())
             .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .build();
-        when(macie2.getMacieSession(any(GetMacieSessionRequest.class))).thenReturn(getMacieSessionResponse);
-        when(macie2.updateMacieSession(any(UpdateMacieSessionRequest.class))).thenReturn(UpdateMacieSessionResponse.builder().build());
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(UpdateMacieSessionRequest.class), any()))
+            .thenReturn(UpdateMacieSessionResponse.builder().build());
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any())).thenReturn(getMacieSessionResponse);
 
         final ResourceModel desiredModel = ResourceModel.builder()
             .status("PAUSED")
+            .awsAccountId(TEST_ACCOUNT_ID)
+            .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .findingPublishingFrequency("SIX_HOURS")
             .build();
@@ -109,6 +86,8 @@ public class UpdateHandlerTest {
             .findingPublishingFrequency("SIX_HOURS")
             .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .awsAccountId(TEST_ACCOUNT_ID)
+            .awsPartition(TEST_AWS_PARTITION)
             .desiredResourceState(model)
             .build();
         final ProgressEvent<ResourceModel, CallbackContext> response
@@ -135,10 +114,13 @@ public class UpdateHandlerTest {
                 .build()
             )
             .build();
-        when(macie2.getMacieSession(any(GetMacieSessionRequest.class))).thenThrow(macieNotEnabledException);
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(UpdateMacieSessionRequest.class), any())).thenThrow(macieNotEnabledException);
 
         final ResourceModel model = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .awsAccountId(TEST_ACCOUNT_ID)
+            .awsPartition(TEST_AWS_PARTITION)
             .desiredResourceState(model)
             .build();
         final ProgressEvent<ResourceModel, CallbackContext> response
@@ -146,8 +128,8 @@ public class UpdateHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getMessage()).contains(MACIE_NOT_ENABLED_MESSAGE);
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+        assertThat(response.getMessage()).contains(String.format(MACIE_NOT_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

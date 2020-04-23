@@ -2,19 +2,14 @@ package software.amazon.macie.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
@@ -36,6 +31,7 @@ public class DeleteHandlerTest {
 
     protected static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     private static final String MACIE_NOT_ENABLED_MESSAGE = "Macie is not enabled";
+    private static final String MACIE_NOT_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private static final String MACIE_NOT_ENABLED_CODE = "403";
 
     @Mock
@@ -51,35 +47,14 @@ public class DeleteHandlerTest {
     @BeforeEach
     public void setup() {
         handler = new DeleteHandler();
-        macie2 = mock(Macie2Client.class);
         logger = new LoggerProxy();
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
-        proxyMacie2Client = new ProxyClient<Macie2Client>() {
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            ResponseT
-            injectCredentialsAndInvokeV2(RequestT request, Function<RequestT, ResponseT> requestFunction) {
-                return proxy.injectCredentialsAndInvokeV2(request, requestFunction);
-            }
-
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            CompletableFuture<ResponseT>
-            injectCredentialsAndInvokeV2Aync(RequestT request,
-                Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public Macie2Client client() {
-                return macie2;
-            }
-        };
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        when(macie2.disableMacie(any(DisableMacieRequest.class))).thenReturn(DisableMacieResponse.builder().build());
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(DisableMacieRequest.class), any())).thenReturn(DisableMacieResponse.builder().build());
 
         final ResourceModel model = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -106,7 +81,8 @@ public class DeleteHandlerTest {
                 .build()
             )
             .build();
-        when(macie2.disableMacie(any(DisableMacieRequest.class))).thenThrow(macieNotEnabledException);
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(DisableMacieRequest.class), any())).thenThrow(macieNotEnabledException);
 
         final ResourceModel model = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -117,8 +93,8 @@ public class DeleteHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getMessage()).contains(MACIE_NOT_ENABLED_MESSAGE);
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+        assertThat(response.getMessage()).contains(String.format(MACIE_NOT_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

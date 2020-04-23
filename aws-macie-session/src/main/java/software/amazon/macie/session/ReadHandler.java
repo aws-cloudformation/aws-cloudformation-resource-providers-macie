@@ -11,6 +11,7 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class ReadHandler extends BaseMacieSessionHandler {
+    private static final String OPERATION = "macie2::getMacieSession";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -25,18 +26,20 @@ public class ReadHandler extends BaseMacieSessionHandler {
         model.setAwsAccountId(request.getAwsAccountId());
 
         // initiate the call context.
-        return proxy.initiate("macie2:getMacieSession", client, model, callbackContext)
+        return proxy.initiate(OPERATION, client, model, callbackContext)
             // transform Resource model properties to getMacieSession API
             .translateToServiceRequest((m) -> GetMacieSessionRequest.builder().build())
             // Make a service call. Handler does not worry about credentials, they are auto injected
             .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::getMacieSession))
             // return appropriate failed progress event status by mapping business exceptions.
-            .handleError((_request, _exception, _client, _model, _context) -> failureProgressEvent(_exception, _model, _context))
+            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, _exception, _model))
             // return success progress event with resource details
-            .done((_request, _response, _client, _model, _context) -> buildModelFromResponse(_model, _response));
+            .done(this::buildModelFromResponse);
     }
 
-    private ProgressEvent<ResourceModel, CallbackContext> buildModelFromResponse(final ResourceModel model, final GetMacieSessionResponse macieSession) {
+    private ProgressEvent<ResourceModel, CallbackContext> buildModelFromResponse(GetMacieSessionRequest getMacieSessionRequest,
+        GetMacieSessionResponse macieSession,
+        ProxyClient<Macie2Client> clientProxyClient, ResourceModel model, CallbackContext callbackContext) {
         model.setStatus(macieSession.statusAsString());
         model.setAwsAccountId(model.getAwsAccountId());
         model.setFindingPublishingFrequency(macieSession.findingPublishingFrequencyAsString());
