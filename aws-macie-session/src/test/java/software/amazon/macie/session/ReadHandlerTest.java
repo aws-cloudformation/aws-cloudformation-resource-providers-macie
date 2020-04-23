@@ -1,31 +1,40 @@
 package software.amazon.macie.session;
 
-import org.mockito.ArgumentMatchers;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionResponse;
-import software.amazon.awssdk.services.macie2.model.Macie2Exception;
-import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.OperationStatus;
-import software.amazon.cloudformation.proxy.ProgressEvent;
-import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.SdkResponse;
+import software.amazon.awssdk.http.SdkHttpResponse;
+import software.amazon.awssdk.services.macie2.model.FindingPublishingFrequency;
+import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
+import software.amazon.awssdk.services.macie2.model.GetMacieSessionResponse;
+import software.amazon.awssdk.services.macie2.model.Macie2Exception;
+import software.amazon.awssdk.services.macie2.model.MacieStatus;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest {
+
+    private static final String MACIE_NOT_ENABLED_MESSAGE
+        = "An error occurred (AccessDeniedException) when calling the GetMacieSession operation: Macie is not enabled";
+    private static final String INTERNAL_ERROR_MESSAGE = "Internal Error";
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -41,34 +50,21 @@ public class ReadHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
+        SdkResponse getMacieSessionResponse = GetMacieSessionResponse.builder()
+            .status(MacieStatus.ENABLED)
+            .findingPublishingFrequency(FindingPublishingFrequency.ONE_HOUR)
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .serviceRole("DummyRole")
+            .sdkHttpResponse(SdkHttpResponse.builder().statusCode(200).build())
+            .build();
+        doReturn(getMacieSessionResponse).when(proxy).injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any());
+
         final ReadHandler handler = new ReadHandler();
-
-        final GetMacieSessionResponse getResponse = GetMacieSessionResponse.builder()
-                                                                          .status("ENABLED")
-                                                                          .findingPublishingFrequency("SIX_HOURS")
-                                                                          .serviceRole("arn:aws:iam::account-id:role/AmazonMacieRole")
-                                                                          .createdAt(Instant.ofEpochSecond(1587543212))
-                                                                          .updatedAt(Instant.ofEpochSecond(1587543212))
-                                                                          .build();
-
-        doReturn(getResponse)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(
-                        ArgumentMatchers.any(),
-                        ArgumentMatchers.any()
-                );
-
-        final ResourceModel model = ResourceModel.builder()
-                                                .status("ENABLED")
-                                                .findingPublishingFrequency("SIX_HOURS")
-                                                .serviceRole("arn:aws:iam::account-id:role/AmazonMacieRole")
-                                                .createdAt("2020-04-22T08:13:32Z")
-                                                .updatedAt("2020-04-22T08:13:32Z")
-                                                .build();
-
+        final ResourceModel model = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                   .desiredResourceState(model)
-                                                                                   .build();
+            .desiredResourceState(model)
+            .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response
             = handler.handleRequest(proxy, request, null, logger);
@@ -84,24 +80,55 @@ public class ReadHandlerTest {
     }
 
     @Test
-    public void handleRequest_AccessDenied() {
+    public void handleRequest_NotFound() {
+        AwsServiceException macieNotEnabledException = Macie2Exception.builder().statusCode(403).message(MACIE_NOT_ENABLED_MESSAGE).build();
+        doThrow(macieNotEnabledException).when(proxy).injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any());
+
         final ReadHandler handler = new ReadHandler();
-
-        doThrow(Macie2Exception.class)
-               .when(proxy)
-               .injectCredentialsAndInvokeV2(
-                       ArgumentMatchers.any(),
-                       ArgumentMatchers.any()
-               );
-
         final ResourceModel model = ResourceModel.builder().build();
-
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                   .desiredResourceState(model)
-                                                                                   .build();
+            .desiredResourceState(model)
+            .build();
+        final ProgressEvent<ResourceModel, CallbackContext> response
+            = handler.handleRequest(proxy, request, null, logger);
 
-        assertThrows(CfnAccessDeniedException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isNull();
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isEqualTo(MACIE_NOT_ENABLED_MESSAGE);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+    }
+
+    @Test
+    public void handleRequest_ServiceException() {
+        AwsServiceException awsServiceException = AwsServiceException.builder().statusCode(500).message(INTERNAL_ERROR_MESSAGE).build();
+        doThrow(awsServiceException).when(proxy).injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any());
+
+        final ReadHandler handler = new ReadHandler();
+        final ResourceModel model = ResourceModel.builder().build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .desiredResourceState(model)
+            .build();
+
+        Exception exception = assertThrows(AwsServiceException.class, () -> handler.handleRequest(proxy, request, null, logger));
+        assertTrue(exception.getMessage().contains(INTERNAL_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void handleRequest_MacieException() {
+        AwsServiceException awsServiceException = Macie2Exception.builder().statusCode(500).message(INTERNAL_ERROR_MESSAGE).build();
+        doThrow(awsServiceException).when(proxy).injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any());
+
+        final ReadHandler handler = new ReadHandler();
+        final ResourceModel model = ResourceModel.builder().build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .desiredResourceState(model)
+            .build();
+
+        Exception exception = assertThrows(Macie2Exception.class, () -> handler.handleRequest(proxy, request, null, logger));
+        assertTrue(exception.getMessage().contains(INTERNAL_ERROR_MESSAGE));
     }
 }

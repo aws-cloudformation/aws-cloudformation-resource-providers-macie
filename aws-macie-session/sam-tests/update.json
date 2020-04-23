@@ -1,0 +1,17 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "",
+    "clientRequestToken": "1b11a1e1-b111-111b-a111-1ababa111aba",
+    "desiredResourceState": {
+      "Status": "DISABLED"
+    },
+    "logicalResourceIdentifier": "Session"
+  },
+  "callbackContext": null
+}

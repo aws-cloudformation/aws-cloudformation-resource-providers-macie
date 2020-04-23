@@ -1,18 +1,25 @@
 package software.amazon.macie.session;
 
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.http.HttpStatusCode;
 import software.amazon.awssdk.services.macie2.Macie2Client;
+import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.awssdk.services.macie2.model.UpdateMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.UpdateMacieSessionRequest.Builder;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class UpdateHandler extends BaseHandler<CallbackContext> {
+
+    AmazonWebServicesClientProxy clientProxy;
+    Macie2Client macie2Client;
+    Logger loggerProxy;
+    String awsAccountId;
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -20,30 +27,51 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
         final Logger logger) {
-        final Macie2Client client = ClientBuilder.getClient();
+
         final ResourceModel model = request.getDesiredResourceState();
+        clientProxy = proxy;
+        macie2Client = ClientBuilder.getClient();
+        loggerProxy = logger;
+        awsAccountId = request.getAwsAccountId();
 
-        final UpdateMacieSessionRequest updateMacieSessionRequest = buildRequest(model);
+        return checkAndUpdateMacieSession(model);
+    }
 
+    private ProgressEvent<ResourceModel, CallbackContext> checkAndUpdateMacieSession(ResourceModel model) {
         try {
-            proxy.injectCredentialsAndInvokeV2(updateMacieSessionRequest, client::updateMacieSession);
-            logger.log(String.format("%s [%s] updated successfully",
-                                     ResourceModel.TYPE_NAME,
-                                     ResourceModelExtensions.getPrimaryIdentifier(model).toString()));
-        } catch (Macie2Exception e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-        }
+            // ensure Macie session exists
+            GetMacieSessionRequest macieSessionRequest = GetMacieSessionRequest.builder().build();
+            clientProxy.injectCredentialsAndInvokeV2(macieSessionRequest, macie2Client::getMacieSession);
 
-        return ProgressEvent.defaultSuccessHandler(model);
+            // now update it
+            return updateMacieSession(model);
+        } catch (AwsServiceException e) {
+            if (e instanceof Macie2Exception && e.statusCode() == HttpStatusCode.FORBIDDEN) {
+                // Macie is not enabled
+                return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .status(OperationStatus.FAILED)
+                    .errorCode(HandlerErrorCode.NotFound)
+                    .message(e.getMessage())
+                    .build();
+            }
+            throw e;
+        }
+    }
+
+    private ProgressEvent<ResourceModel, CallbackContext> updateMacieSession(ResourceModel model) {
+        clientProxy.injectCredentialsAndInvokeV2(buildRequest(model), macie2Client::updateMacieSession);
+        return ProgressEvent.<ResourceModel, CallbackContext>builder()
+            .resourceModel(model)
+            .status(OperationStatus.SUCCESS)
+            .build();
     }
 
     private UpdateMacieSessionRequest buildRequest(ResourceModel model) {
-        Builder builder = UpdateMacieSessionRequest.builder();
-        if (!model.getStatus().isEmpty()) {
+        UpdateMacieSessionRequest.Builder builder = UpdateMacieSessionRequest.builder();
+        if (StringUtils.isNotEmpty(model.getStatus())) {
             builder.status(model.getStatus());
         }
-
-        if (!model.getFindingPublishingFrequency().isEmpty()) {
+        if (StringUtils.isNotEmpty(model.getFindingPublishingFrequency())) {
             builder.findingPublishingFrequency(model.getFindingPublishingFrequency());
         }
 

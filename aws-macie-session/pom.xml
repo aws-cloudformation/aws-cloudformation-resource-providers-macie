@@ -73,6 +73,11 @@
             <artifactId>macie2</artifactId>
             <version>2.10.70</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
     </dependencies>
 
     <build>

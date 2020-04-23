@@ -1,0 +1,18 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "awsAccountId": "",
+    "clientRequestToken": "1b11a1e1-b111-111b-a111-1ababa111aba",
+    "desiredResourceState": {
+      "Status": "ENABLED",
+      "FindingPublishingFrequency": "ONE_HOUR"
+    },
+    "logicalResourceIdentifier": "Session"
+  },
+  "callbackContext": null
+}
