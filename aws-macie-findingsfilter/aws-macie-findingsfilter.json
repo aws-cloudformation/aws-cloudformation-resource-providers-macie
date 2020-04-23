@@ -54,30 +54,49 @@
   },
   "properties": {
     "Name": {
+      "description": "Findings filter name",
       "type": "string"
     },
     "Description": {
+      "description": "Findings filter description",
       "type": "string"
     },
     "FindingCriteria": {
+      "description": "Findings filter criteria.",
       "$ref": "#/definitions/FindingCriteria"
     },
     "Action": {
+      "description": "Findings filter action.",
       "$ref": "#/definitions/FindingFilterAction"
     },
     "Position": {
+      "description": "Findings filter position.",
       "type": "integer"
+    },
+    "FilterId": {
+      "description": "Findings filter ID.",
+      "type": "string"
+    },
+    "Arn": {
+      "description": "Findings filter ARN.",
+      "type": "string"
     }
   },
   "additionalProperties": false,
-  "required": [
-    "/properties/Name"
-  ],
   "readOnlyProperties": [
-    "/properties/Name"
+    "/properties/FilterId",
+    "/properties/Arn"
   ],
   "primaryIdentifier": [
-    "/properties/Name"
+    "/properties/FilterId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ],
+    [
+      "/properties/Name"
+    ]
   ],
   "handlers": {
     "create": {

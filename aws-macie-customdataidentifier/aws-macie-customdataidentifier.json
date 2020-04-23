@@ -12,7 +12,7 @@
       "type": "string"
     },
     "Description": {
-      "description": "The description of custom data identifier.",
+      "description": "Description of custom data identifier.",
       "type": "string"
     },
     "Regex": {
@@ -20,29 +20,46 @@
       "type": "string"
     },
     "MaximumMatchDistance": {
-      "description": "Maximum match distance",
+      "description": "Maximum match distance.",
       "type": "integer"
     },
     "Keywords": {
-      "description": "Keywords",
+      "description": "Keywords to be matched against.",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "IgnoreWords": {
-      "description": "Words to be ignored",
+      "description": "Words to be ignored.",
       "type": "array",
       "items": {
         "type": "string"
       }
+    },
+    "Id": {
+      "description": "Custom data identifier ID.",
+      "type": "string"
+    },
+    "Arn": {
+      "description": "Custom data identifier ARN.",
+      "type": "string"
+    },
+    "CreatedAt": {
+      "description": "Date-time at which the custom data identifier was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "Deleted": {
+      "description": "Whether the customer data identifier has been deleted.",
+      "type": "boolean"
     }
   },
   "additionalProperties": false,
   "required": [
     "Name"
   ],
-  "readOnlyProperties": [
+  "createOnlyProperties": [
     "/properties/Name",
     "/properties/ResourceId",
     "/properties/Description",
@@ -51,13 +68,30 @@
     "/properties/Keywords",
     "/properties/IgnoreWords"
   ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn",
+    "/properties/CreatedAt",
+    "/properties/Deleted"
+  ],
   "primaryIdentifier": [
-    "/properties/Name"
+    "/properties/Id"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ]
   ],
   "handlers": {
     "create": {
       "permissions": [
-        "macie2:CreateCustomDataIdentifier"
+        "macie2:CreateCustomDataIdentifier",
+        "macie2:ListCustomDataIdentifiers"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "macie2:GetCustomDataIdentifier"
       ]
     },
     "delete": {
@@ -68,11 +102,6 @@
     "list": {
       "permissions": [
         "macie2:ListCustomDataIdentifiers"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "macie2:GetCustomDataIdentifier"
       ]
     }
   }

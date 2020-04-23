@@ -37,7 +37,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                                                  .build();
 
         ListCustomDataIdentifiersResponse listCustomDataIdentifiersResponse
-                = client.listCustomDataIdentifiers(listCustomDataIdentifiersRequest);
+                = proxy.injectCredentialsAndInvokeV2(listCustomDataIdentifiersRequest, client::listCustomDataIdentifiers);
 
         Optional<CustomDataIdentifierSummary> existingCustomDataIdentifier
                 = listCustomDataIdentifiersResponse.items()
@@ -53,10 +53,13 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             progressEventBuilder.status(OperationStatus.SUCCESS)
                                 .callbackContext(CallbackContext.builder()
                                                                 .customDataIdentifierId(
-                                                                        client.createCustomDataIdentifier(
-                                                                                  buildRequest(request, model))
-                                                                              .customDataIdentifierId())
-                                                                .build());
+                                                                        proxy.injectCredentialsAndInvokeV2(
+                                                                                buildRequest(request, model),
+                                                                                client::createCustomDataIdentifier)
+                                                                             .customDataIdentifierId())
+                                                                .build()
+                                );
+
         }
 
         return progressEventBuilder.build();
