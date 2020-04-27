@@ -4,7 +4,6 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
-import software.amazon.awssdk.services.macie2.model.MacieStatus;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -69,7 +68,7 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
                 GetMacieSessionRequest.builder().build(),
                 proxyClient.client()::getMacieSession);
             return true;
-        } catch (Macie2Exception e){
+        } catch (Macie2Exception e) {
             return false;
         }
     }
