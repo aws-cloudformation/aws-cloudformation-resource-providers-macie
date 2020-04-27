@@ -1,66 +1,33 @@
 package software.amazon.macie.session;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.http.HttpStatusCode;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.DisableMacieRequest;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-public class DeleteHandler extends BaseHandler<CallbackContext> {
-
-    AmazonWebServicesClientProxy clientProxy;
-    Macie2Client macie2Client;
-    Logger loggerProxy;
-    String awsAccountId;
+public class DeleteHandler extends BaseMacieSessionHandler {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
+        final ProxyClient<Macie2Client> client,
         final Logger logger
     ) {
         final ResourceModel model = request.getDesiredResourceState();
-        clientProxy = proxy;
-        macie2Client = ClientBuilder.getClient();
-        loggerProxy = logger;
-        awsAccountId = request.getAwsAccountId();
-
-        return checkAndDisableMacie(model);
-    }
-
-    private ProgressEvent<ResourceModel, CallbackContext> checkAndDisableMacie(ResourceModel model) {
-        try {
-            // ensure Macie session exists
-            GetMacieSessionRequest macieSessionRequest = GetMacieSessionRequest.builder().build();
-            clientProxy.injectCredentialsAndInvokeV2(macieSessionRequest, macie2Client::getMacieSession);
-
-            // now disable it
-            return disableMacie(model);
-        } catch (AwsServiceException e) {
-            if (e instanceof Macie2Exception && e.statusCode() == HttpStatusCode.FORBIDDEN) {
-                // Macie is not enabled
-                return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                    .status(OperationStatus.FAILED)
-                    .errorCode(HandlerErrorCode.NotFound)
-                    .message(e.getMessage())
-                    .build();
-            }
-            throw e;
-        }
-    }
-
-    private ProgressEvent<ResourceModel, CallbackContext> disableMacie(ResourceModel model) {
-        clientProxy.injectCredentialsAndInvokeV2(DisableMacieRequest.builder().build(), macie2Client::disableMacie);
-        return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .status(OperationStatus.SUCCESS)
-            .build();
+        // initiate the call context.
+        return proxy.initiate("macie2:disableMacie", client, model, callbackContext)
+            // transform Resource model properties to DisableMacie API
+            .translateToServiceRequest((m) -> DisableMacieRequest.builder().build())
+            // Make a service call. Handler does not worry about credentials, they are auto injected
+            .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::disableMacie))
+            // return appropriate failed progress event status by mapping business exceptions.
+            .handleError((_request, _exception, _client, _model, _context) -> failureProgressEvent(_exception, _model, _context))
+            // return success
+            .success();
     }
 }

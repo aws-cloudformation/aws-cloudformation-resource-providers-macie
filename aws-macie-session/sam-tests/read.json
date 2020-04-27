@@ -7,6 +7,7 @@
   "action": "READ",
   "request": {
     "awsAccountId": "",
+    "awsPartition": "",
     "clientRequestToken": "1b11a1e1-b111-111b-a111-1ababa111aba",
     "desiredResourceState": {},
     "logicalResourceIdentifier": "Session"

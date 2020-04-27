@@ -11,7 +11,7 @@
       "type": "string",
       "enum": [
         "ENABLED",
-        "DISABLED"
+        "PAUSED"
       ],
       "default": "ENABLED"
     },
@@ -25,20 +25,8 @@
       ],
       "default": "SIX_HOURS"
     },
-    "ClientToken": {
-      "description": "Used by AMS to keep their actions idempotent",
-      "type": "string"
-    },
     "ServiceRole": {
       "description": "Service role used by Macie",
-      "type": "string"
-    },
-    "CreatedAt": {
-      "description": "Date-time at which the Macie session was created",
-      "type": "string"
-    },
-    "UpdatedAt": {
-      "description": "Date-time at which the Macie session was last updated",
       "type": "string"
     }
   },
@@ -47,15 +35,7 @@
   ],
   "readOnlyProperties": [
     "/properties/AwsAccountId",
-    "/properties/ServiceRole",
-    "/properties/CreatedAt",
-    "/properties/UpdatedAt"
-  ],
-  "writeOnlyProperties": [
-    "/properties/ClientToken"
-  ],
-  "createOnlyProperties": [
-    "/properties/ClientToken"
+    "/properties/ServiceRole"
   ],
   "additionalProperties": false,
   "handlers": {
