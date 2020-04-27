@@ -43,8 +43,6 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
         final CallbackContext context) {
         ProgressEventBuilder<ResourceModel, CallbackContext> failedProcessEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
             .status(OperationStatus.FAILED)
-            .resourceModel(model)
-            .callbackContext(context)
             .message(exception.getMessage());
         if (exception.getMessage().contains(MACIE_NOT_ENABLED)) {
             failedProcessEvent.errorCode(HandlerErrorCode.NotFound);

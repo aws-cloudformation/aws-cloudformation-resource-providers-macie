@@ -4,7 +4,9 @@ import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.DisableMacieRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProgressEvent.ProgressEventBuilder;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
@@ -28,6 +30,9 @@ public class DeleteHandler extends BaseMacieSessionHandler {
             // return appropriate failed progress event status by mapping business exceptions.
             .handleError((_request, _exception, _client, _model, _context) -> failureProgressEvent(_exception, _model, _context))
             // return success
-            .success();
+            .done((_request, _response, _client, _model, _context) -> ProgressEvent.<ResourceModel, CallbackContext>builder()
+                .status(OperationStatus.SUCCESS)
+                .resourceModel(_model)
+                .build());
     }
 }
