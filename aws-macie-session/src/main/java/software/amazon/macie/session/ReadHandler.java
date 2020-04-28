@@ -3,53 +3,47 @@ package software.amazon.macie.session;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
 import software.amazon.awssdk.services.macie2.model.GetMacieSessionResponse;
-import software.amazon.awssdk.services.macie2.model.Macie2Exception;
-import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-public class ReadHandler extends BaseHandler<CallbackContext> {
-
-    private AmazonWebServicesClientProxy proxy;
-    private Macie2Client client;
+public class ReadHandler extends BaseMacieSessionHandler {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final Logger logger
-    ) {
-        this.proxy = proxy;
-        this.client = ClientBuilder.getClient();
+        final ProxyClient<Macie2Client> client,
+        final Logger logger) {
 
-        final ResourceModel model = getMacieSession();
+        final ResourceModel model = request.getDesiredResourceState();
+        // We use awsAccountId as Macie session primary identifier
+        model.setAwsAccountId(request.getAwsAccountId());
 
+        // initiate the call context.
+        return proxy.initiate("macie2:getMacieSession", client, model, callbackContext)
+            // transform Resource model properties to getMacieSession API
+            .translateToServiceRequest((m) -> GetMacieSessionRequest.builder().build())
+            // Make a service call. Handler does not worry about credentials, they are auto injected
+            .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::getMacieSession))
+            // return appropriate failed progress event status by mapping business exceptions.
+            .handleError((_request, _exception, _client, _model, _context) -> failureProgressEvent(_exception, _model, _context))
+            // return success progress event with resource details
+            .done((_request, _response, _client, _model, _context) -> buildModelFromResponse(_model, _response));
+    }
+
+    private ProgressEvent<ResourceModel, CallbackContext> buildModelFromResponse(final ResourceModel model, final GetMacieSessionResponse macieSession) {
+        model.setStatus(macieSession.statusAsString());
+        model.setAwsAccountId(model.getAwsAccountId());
+        model.setFindingPublishingFrequency(macieSession.findingPublishingFrequencyAsString());
+        model.setServiceRole(macieSession.serviceRole());
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
             .resourceModel(model)
             .status(OperationStatus.SUCCESS)
             .build();
-    }
-
-    private ResourceModel getMacieSession() {
-        final GetMacieSessionRequest request = GetMacieSessionRequest.builder().build();
-        final GetMacieSessionResponse response;
-
-        try {
-            response = proxy.injectCredentialsAndInvokeV2(request, client::getMacieSession);
-        } catch (final Macie2Exception e) {
-            throw new CfnAccessDeniedException(ResourceModel.TYPE_NAME);
-        }
-
-        return ResourceModel.builder()
-                            .status(response.statusAsString())
-                            .findingPublishingFrequency(response.findingPublishingFrequencyAsString())
-                            .serviceRole(response.serviceRole())
-                            .createdAt(response.createdAt().toString())
-                            .updatedAt(response.updatedAt().toString())
-                            .build();
     }
 }

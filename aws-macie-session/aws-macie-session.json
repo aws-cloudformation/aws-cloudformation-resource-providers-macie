@@ -2,13 +2,18 @@
   "typeName": "AWS::Macie::Session",
   "description": "The AWS::Macie::Session resource specifies a new Amazon Macie session. A session is an object that represents the Amazon Macie service. A session is required for Amazon Macie to become operational.",
   "properties": {
+    "AwsAccountId": {
+      "description": "AWS account ID of customer",
+      "type": "string"
+    },
     "Status": {
       "description": "A enumeration value that specifies the status of the Macie Session.",
       "type": "string",
       "enum": [
         "ENABLED",
         "PAUSED"
-      ]
+      ],
+      "default": "ENABLED"
     },
     "FindingPublishingFrequency": {
       "description": "A enumeration value that specifies how frequently finding updates are published.",
@@ -21,32 +26,22 @@
       "default": "SIX_HOURS"
     },
     "ServiceRole": {
-      "description": "The service-linked role.",
+      "description": "Service role used by Macie",
       "type": "string"
-    },
-    "CreatedAt": {
-      "description": "Date-time at which the custom data identifier was created.",
-      "type": "string",
-      "format": "date-time"
-    },
-    "UpdatedAt": {
-      "description": "Date-time at which the custom data identifier was last updated.",
-      "type": "string",
-      "format": "date-time"
     }
   },
   "primaryIdentifier": [
-    "/properties/ServiceRole"
+    "/properties/AwsAccountId"
   ],
   "readOnlyProperties": [
-    "/properties/ServiceRole",
-    "/properties/CreatedAt",
-    "/properties/UpdatedAt"
+    "/properties/AwsAccountId",
+    "/properties/ServiceRole"
   ],
   "additionalProperties": false,
   "handlers": {
     "create": {
       "permissions": [
+        "macie2:GetMacieSession",
         "macie2:EnableMacie"
       ]
     },
@@ -57,11 +52,13 @@
     },
     "update": {
       "permissions": [
+        "macie2:GetMacieSession",
         "macie2:UpdateMacieSession"
       ]
     },
     "delete": {
       "permissions": [
+        "macie2:GetMacieSession",
         "macie2:DisableMacie"
       ]
     }

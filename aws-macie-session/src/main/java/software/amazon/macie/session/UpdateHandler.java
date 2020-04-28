@@ -1,52 +1,40 @@
 package software.amazon.macie.session;
 
 import software.amazon.awssdk.services.macie2.Macie2Client;
-import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.awssdk.services.macie2.model.UpdateMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.UpdateMacieSessionRequest.Builder;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-public class UpdateHandler extends BaseHandler<CallbackContext> {
+public class UpdateHandler extends BaseMacieSessionHandler {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final Logger logger) {
-        final Macie2Client client = ClientBuilder.getClient();
+        final ProxyClient<Macie2Client> client,
+        final Logger logger
+    ) {
         final ResourceModel model = request.getDesiredResourceState();
 
-        final UpdateMacieSessionRequest updateMacieSessionRequest = buildRequest(model);
-
-        try {
-            proxy.injectCredentialsAndInvokeV2(updateMacieSessionRequest, client::updateMacieSession);
-            logger.log(String.format("%s [%s] updated successfully",
-                                     ResourceModel.TYPE_NAME,
-                                     ResourceModelExtensions.getPrimaryIdentifier(model).toString()));
-        } catch (Macie2Exception e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-        }
-
-        return ProgressEvent.defaultSuccessHandler(model);
-    }
-
-    private UpdateMacieSessionRequest buildRequest(ResourceModel model) {
-        Builder builder = UpdateMacieSessionRequest.builder();
-        if (!model.getStatus().isEmpty()) {
-            builder.status(model.getStatus());
-        }
-
-        if (!model.getFindingPublishingFrequency().isEmpty()) {
-            builder.findingPublishingFrequency(model.getFindingPublishingFrequency());
-        }
-
-        return builder.build();
+        // initiate the call context.
+        return proxy.initiate("macie2:updateMacieSession", client, model, callbackContext)
+            // transform Resource model properties to UpdateMacieSession API
+            .translateToServiceRequest((m) -> UpdateMacieSessionRequest.builder()
+                .findingPublishingFrequency(m.getFindingPublishingFrequency())
+                .status(m.getStatus())
+                .build())
+            // Make a service call. Handler does not worry about credentials, they are auto injected
+            .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::updateMacieSession))
+            // return appropriate failed progress event status by mapping business exceptions.
+            .handleError((_request, _exception, _client, _model, _context) -> failureProgressEvent(_exception, _model, _context))
+            // Once ACTIVE return progress
+            .progress()
+            // we then delegate to ReadHandler to read the live state and send back successful response.
+            .then((r) -> new ReadHandler()
+                .handleRequest(proxy, request, callbackContext, client, logger));
     }
 }
