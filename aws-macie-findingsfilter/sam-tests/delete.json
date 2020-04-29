@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "DELETE",
+  "request": {
+    "clientRequestToken": "",
+    "desiredResourceState": {
+      "filterid": ""
+    },
+    "logicalResourceIdentifier": "FindingsFilter"
+  },
+  "callbackContext": null
+}

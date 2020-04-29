@@ -1,0 +1,25 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "",
+    "desiredResourceState": {
+      "name": "filtername",
+      "findingCriteria": {
+        "criterion": {
+          "accountId": {
+            "eq": ["1234567890"]
+          }
+        }
+      },
+      "action": "ARCHIVE",
+      "description": "filternamedesc"
+    },
+    "logicalResourceIdentifier": "FindingsFilter"
+  },
+  "callbackContext": null
+}
