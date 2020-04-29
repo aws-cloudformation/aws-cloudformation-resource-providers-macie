@@ -1,0 +1,28 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "UPDATE",
+  "request": {
+    "clientRequestToken": "",
+    "desiredResourceState": {
+      "filterId": "",
+      "name": "filtername",
+      "findingCriteria": {
+        "criterion": {
+          "accountId": {
+            "neq": [
+              "1234567890"
+            ]
+          }
+        }
+      },
+      "action": "ARCHIVE",
+      "description": "filtername desc"
+    },
+    "logicalResourceIdentifier": "FindingsFilter"
+  },
+  "callbackContext": null
+}
