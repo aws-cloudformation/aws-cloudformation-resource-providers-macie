@@ -1,9 +1,9 @@
 {
   "typeName": "AWS::Macie::FindingsFilter",
   "description": "Macie FindingsFilter resource schema.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-macie.git",
   "definitions": {
-    "Criterion": {
+    "CriterionAdditionalProperties": {
       "type": "object",
       "properties": {
         "Gt": {
@@ -36,6 +36,15 @@
         }
       }
     },
+    "Criterion": {
+      "description": "Map of filter criteria.",
+      "type": "object",
+      "patternProperties": {
+        "\\w": {
+          "$ref": "#/definitions/CriterionAdditionalProperties"
+        }
+      }
+    },
     "FindingCriteria": {
       "type": "object",
       "properties": {
@@ -50,6 +59,18 @@
         "ARCHIVE",
         "NOOP"
       ]
+    },
+    "FilterListItem": {
+      "description": "Returned by ListHandler representing filter name and ID.",
+      "type": "object",
+      "properties": {
+        "filterId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
     }
   },
   "properties": {
@@ -80,12 +101,20 @@
     "Arn": {
       "description": "Findings filter ARN.",
       "type": "string"
+    },
+    "FilterListItems": {
+      "description": "Findings filters list.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FilterListItem"
+      }
     }
   },
   "additionalProperties": false,
   "readOnlyProperties": [
     "/properties/FilterId",
-    "/properties/Arn"
+    "/properties/Arn",
+    "/properties/FilterListItems"
   ],
   "primaryIdentifier": [
     "/properties/FilterId"
@@ -101,6 +130,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "macie:DescribeFindingsFilter",
         "macie:CreateFindingsFilter"
       ]
     },
@@ -111,6 +141,7 @@
     },
     "update": {
       "permissions": [
+        "macie:DescribeFindingsFilter",
         "macie:UpdateFindingsFilter"
       ]
     },

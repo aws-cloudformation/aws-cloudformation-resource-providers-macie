@@ -1,0 +1,14 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "LIST",
+  "request": {
+    "clientRequestToken": "",
+    "desiredResourceState": {},
+    "logicalResourceIdentifier": "FindingsFilter"
+  },
+  "callbackContext": null
+}
