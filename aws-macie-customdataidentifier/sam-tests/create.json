@@ -1,0 +1,17 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "1b11a1e1-b111-111b-a111-1ababa111aba",
+    "desiredResourceState": {
+      "Name": "my-custom-data-identifier",
+      "Regex": "[0-9]{12}"
+    },
+    "logicalResourceIdentifier": "MyCustomDataIdentifier"
+  },
+  "callbackContext": null
+}
