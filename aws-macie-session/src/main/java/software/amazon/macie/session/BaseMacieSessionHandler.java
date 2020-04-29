@@ -15,7 +15,7 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
     // All Macie session APIs return this message whe Macie is not enabled
     // Error code being 403, we can't depend on error code for this.
     protected final static String MACIE_NOT_ENABLED = "Macie is not enabled";
-    protected final static String MACIE_ALRAEDY_ENABLED = "Macie has already been enabled";
+    protected final static String MACIE_ALREADY_ENABLED = "Macie has already been enabled";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(AmazonWebServicesClientProxy proxy,
@@ -38,7 +38,7 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
     public ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation, final Exception exception, final ResourceModel model) {
         if (exception.getMessage().contains(MACIE_NOT_ENABLED)) {
             throw new CfnNotFoundException(model.TYPE_NAME, model.getAwsAccountId(), exception);
-        } else if (exception.getMessage().contains(MACIE_ALRAEDY_ENABLED)) {
+        } else if (exception.getMessage().contains(MACIE_ALREADY_ENABLED)) {
             throw new CfnAlreadyExistsException(model.TYPE_NAME, model.getAwsAccountId(), exception);
         } else {
             throw new CfnGeneralServiceException(operation, exception);
