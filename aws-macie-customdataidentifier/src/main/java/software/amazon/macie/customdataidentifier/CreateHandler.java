@@ -28,24 +28,29 @@ public class CreateHandler extends BaseHandlerStd {
 
         // If your service API throws 'ResourceAlreadyExistsException' for create requests then CreateHandler can return just proxy.initiate construction
         // STEP 1.0 [initialize a proxy context]
-        return proxy.initiate("AWS-Macie-CustomDataIdentifier::Create", proxyClient, model, callbackContext)
+        return ProgressEvent.progress(model, callbackContext)
+                .then(progress ->
+                    proxy.initiate("AWS-Macie-CustomDataIdentifier::Create", proxyClient, model, callbackContext)
 
-                    // STEP 1.1 [construct a body of a request]
-                    .translateToServiceRequest(_model -> Translator.translateToCreateRequest(_model, request.getClientRequestToken()))
+                        // STEP 1.1 [construct a body of a request]
+                        .translateToServiceRequest(_model -> Translator.translateToCreateRequest(_model, request.getClientRequestToken()))
 
-                    // STEP 1.2 [make an api call]
-                    .makeServiceCall(this::createResource)
+                        // STEP 1.2 [make an api call]
+                        .makeServiceCall(this::createResource)
 
-                    // STEP 1.4 [gather all properties of the resource]
-                    .done(this::constructResourceModelFromResponse)
+                        // STEP 1.4 [stabilize the resource]
+                        .stabilize(this::stabilizedOnCreate)
 
-                    // STEP 1.5 [describe call/chain to return the resource model]
-                    .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+                        .progress()
+                )
+                // STEP 1.5 [describe call/chain to return the resource model]
+                .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**
      * Implement client invocation of the create request through the proxyClient, which is already initialised with
      * caller credentials, correct region and retry settings
+     *
      * @param request the aws service request to create a resource
      * @param proxyClient the aws service client to make the call
      * @return create resource response
@@ -66,21 +71,22 @@ public class CreateHandler extends BaseHandlerStd {
     }
 
     /**
-     * Implement client invocation of the create request through the proxyClient, which is already initialised with
-     * caller credentials, correct region and retry settings
-     * @param model the resource model as passed to the Create handler
-     * @param response the aws service create resource response
-     * @param callbackContext the callback context
-     * @return progressEvent indicating success, in progress with delay callback or failed state
+     * Using stabilize to pass the returned custom data identifier ID from the Create API to the Read API.
+     *
+     * @param request the aws service request to create a resource
+     * @param response the aws service response to create a resource
+     * @param proxyClient the aws service client to make the call
+     * @param callbackContext callback context
+     * @return boolean state of stabilized or not
      */
-    private ProgressEvent<ResourceModel, CallbackContext> constructResourceModelFromResponse(
-        final CreateCustomDataIdentifierRequest request,
-        final CreateCustomDataIdentifierResponse response,
-        final ProxyClient<Macie2Client> proxyClient,
-        final ResourceModel model,
-        final CallbackContext callbackContext
+    private boolean stabilizedOnCreate(
+            final CreateCustomDataIdentifierRequest request,
+            final CreateCustomDataIdentifierResponse response,
+            final ProxyClient<Macie2Client> proxyClient,
+            final ResourceModel model,
+            final CallbackContext callbackContext
     ) {
-        return ProgressEvent.defaultInProgressHandler(callbackContext, 0,
-                                                      Translator.translateFromCreateResponse(request, response));
+        model.setId(response.customDataIdentifierId());
+        return true;
     }
 }

@@ -1,6 +1,5 @@
 package software.amazon.macie.customdataidentifier;
 
-import com.amazonaws.util.StringUtils;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierResponse;
@@ -42,10 +41,6 @@ public class DeleteHandler extends BaseHandlerStd {
                     // STEP 1.2 [make an api call]
                     .makeServiceCall(this::deleteResource)
 
-                    // STEP 1.3 [stabilize step is not necessarily required but typically involves describing the resource until it is in a certain status, though it can take many forms]
-                    // for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-                    .stabilize(this::stabilizedOnDelete)
-
                     .success());
     }
 
@@ -71,43 +66,5 @@ public class DeleteHandler extends BaseHandlerStd {
 
         logger.log(String.format("%s successfully deleted.", ResourceModel.TYPE_NAME));
         return response;
-    }
-
-    /**
-     * If deletion of your resource requires some form of stabilization (e.g. propagation delay)
-     * for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-     * @param request the aws service request to delete a resource
-     * @param response the aws service response to delete a resource
-     * @param proxyClient the aws service client to make the call
-     * @param model resource model
-     * @param callbackContext callback context
-     * @return boolean state of stabilized or not
-     */
-    private boolean stabilizedOnDelete(
-        final DeleteCustomDataIdentifierRequest request,
-        final DeleteCustomDataIdentifierResponse response,
-        final ProxyClient<Macie2Client> proxyClient,
-        final ResourceModel model,
-        final CallbackContext callbackContext
-    ) {
-        final boolean stabilized = isStabilized(model, proxyClient);
-
-        if (stabilized) {
-            logger.log(String.format("%s has successfully been deleted. Stabilized.", ResourceModel.TYPE_NAME));
-        }
-
-        return stabilized;
-    }
-
-    private boolean isStabilized(final ResourceModel model, final ProxyClient<Macie2Client> proxyClient) {
-        try {
-            String id = proxyClient.injectCredentialsAndInvokeV2(Translator.translateToReadRequest(model), proxyClient.client()::getCustomDataIdentifier).id();
-            return !StringUtils.hasValue(id);
-        } catch (final ResourceNotFoundException e) {
-            return true;
-        } catch (final Macie2Exception e) {
-            // any other exception means the resource was not successfully deleted (throttling, internal server error, etc.)
-            return false;
-        }
     }
 }
