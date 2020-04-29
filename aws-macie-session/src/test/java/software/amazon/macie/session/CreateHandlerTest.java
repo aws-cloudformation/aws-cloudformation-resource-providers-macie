@@ -2,6 +2,7 @@ package software.amazon.macie.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
@@ -75,8 +76,8 @@ public class CreateHandlerTest {
             .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
-        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(EnableMacieRequest.class), any())).thenReturn(EnableMacieResponse.builder().build());
-        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any())).thenReturn(getMacieSessionResponse);
+        lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(EnableMacieRequest.class), any())).thenReturn(EnableMacieResponse.builder().build());
+        lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any())).thenReturn(getMacieSessionResponse);
 
         final ResourceModel desiredOutputModel = ResourceModel.builder()
             .awsAccountId(TEST_ACCOUNT_ID)
