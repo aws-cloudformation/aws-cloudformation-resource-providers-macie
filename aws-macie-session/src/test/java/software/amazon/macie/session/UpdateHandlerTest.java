@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
+import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_NOT_ENABLED;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -35,8 +36,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest {
 
-    protected static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
-    private static final String MACIE_NOT_ENABLED_MESSAGE = "Macie is not enabled";
+    private static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     private static final String MACIE_NOT_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private static final String MACIE_NOT_ENABLED_CODE = "403";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/SERVICE-ROLE-NAME";
@@ -70,7 +70,7 @@ public class UpdateHandlerTest {
             .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
-        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(UpdateMacieSessionRequest.class), any()))
+        lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(UpdateMacieSessionRequest.class), any()))
             .thenReturn(UpdateMacieSessionResponse.builder().build());
         lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any())).thenReturn(getMacieSessionResponse);
 
@@ -110,7 +110,7 @@ public class UpdateHandlerTest {
             .statusCode(403)
             .awsErrorDetails(AwsErrorDetails.builder()
                 .errorCode(MACIE_NOT_ENABLED_CODE)
-                .errorMessage(MACIE_NOT_ENABLED_MESSAGE)
+                .errorMessage(MACIE_NOT_ENABLED)
                 .sdkHttpResponse(SdkHttpResponse.builder().statusCode(Integer.parseInt(MACIE_NOT_ENABLED_CODE)).build())
                 .build()
             )

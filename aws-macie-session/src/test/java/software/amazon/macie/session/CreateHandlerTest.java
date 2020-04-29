@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
+import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_ALREADY_ENABLED;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -35,9 +36,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
 
-    protected static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
+    private static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     private static final String MACIE_ALREADY_ENABLED_CODE = "409";
-    private static final String MACIE_ALREADY_ENABLED_MESSAGE = "Macie has already been enabled";
     private static final String MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/aws-service-role/macie.amazonaws.com/AWSServiceRoleForAmazonMacie";
     private static final String CLIENT_TOKEN = "CLIENT_TOKEN";
@@ -109,7 +109,7 @@ public class CreateHandlerTest {
         AwsServiceException macieAlreadyEnabledException = Macie2Exception.builder()
             .awsErrorDetails(AwsErrorDetails.builder()
                 .errorCode(MACIE_ALREADY_ENABLED_CODE)
-                .errorMessage(MACIE_ALREADY_ENABLED_MESSAGE)
+                .errorMessage(MACIE_ALREADY_ENABLED)
                 .sdkHttpResponse(SdkHttpResponse.builder().statusCode(Integer.parseInt(MACIE_ALREADY_ENABLED_CODE)).build())
                 .build()
             )
