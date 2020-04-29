@@ -1,15 +1,12 @@
 package software.amazon.macie.session;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.macie2.Macie2Client;
-import software.amazon.awssdk.services.macie2.model.GetMacieSessionRequest;
-import software.amazon.awssdk.services.macie2.model.Macie2Exception;
+import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
-import software.amazon.cloudformation.proxy.ProgressEvent.ProgressEventBuilder;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
@@ -38,38 +35,13 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
         ProxyClient<Macie2Client> proxyClient,
         Logger logger);
 
-    protected ProgressEvent<ResourceModel, CallbackContext> failureProgressEvent(final Exception exception, final ResourceModel model,
-        final CallbackContext context) {
-        ProgressEventBuilder<ResourceModel, CallbackContext> failedProcessEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .status(OperationStatus.FAILED)
-            .message(exception.getMessage());
+    public ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation, final Exception exception, final ResourceModel model) {
         if (exception.getMessage().contains(MACIE_NOT_ENABLED)) {
-            failedProcessEvent.errorCode(HandlerErrorCode.NotFound);
+            throw new CfnNotFoundException(model.TYPE_NAME, model.getAwsAccountId(), exception);
         } else if (exception.getMessage().contains(MACIE_ALRAEDY_ENABLED)) {
-            failedProcessEvent.errorCode(HandlerErrorCode.AlreadyExists);
+            throw new CfnAlreadyExistsException(model.TYPE_NAME, model.getAwsAccountId(), exception);
         } else {
-            // Not all HTTPStatus code are HandlerErrorCode members.
-            HandlerErrorCode handlerErrorCode;
-            try {
-                handlerErrorCode = HandlerErrorCode.valueOf(((AwsServiceException) exception).awsErrorDetails().errorCode());
-            } catch (IllegalArgumentException e) {
-                handlerErrorCode = HandlerErrorCode.GeneralServiceException;
-            }
-            failedProcessEvent.errorCode(handlerErrorCode);
-        }
-        return failedProcessEvent.build();
-    }
-
-
-    protected boolean isStabilized(final ResourceModel model, final ProxyClient<Macie2Client> proxyClient) {
-        try {
-            // Check if Macie status can be queried successfully.
-            proxyClient.injectCredentialsAndInvokeV2(
-                GetMacieSessionRequest.builder().build(),
-                proxyClient.client()::getMacieSession);
-            return true;
-        } catch (Macie2Exception e) {
-            return false;
+            throw new CfnGeneralServiceException(operation, exception);
         }
     }
 }

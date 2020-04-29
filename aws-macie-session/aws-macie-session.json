@@ -52,13 +52,11 @@
     },
     "update": {
       "permissions": [
-        "macie2:GetMacieSession",
         "macie2:UpdateMacieSession"
       ]
     },
     "delete": {
       "permissions": [
-        "macie2:GetMacieSession",
         "macie2:DisableMacie"
       ]
     }

@@ -2,22 +2,16 @@ package software.amazon.macie.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
@@ -43,8 +37,8 @@ public class CreateHandlerTest {
 
     protected static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     private static final String MACIE_ALREADY_ENABLED_CODE = "409";
-    private static final String MACIE_ALREADY_ENABLED_MESSAGE
-        = "An error occurred (ConflictException) when calling the EnableMacie operation: Macie has already been enabled";
+    private static final String MACIE_ALREADY_ENABLED_MESSAGE = "Macie has already been enabled";
+    private static final String MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/aws-service-role/macie.amazonaws.com/AWSServiceRoleForAmazonMacie";
     private static final String CLIENT_TOKEN = "CLIENT_TOKEN";
     private static final String TEST_ACCOUNT_ID = "999999999999";
@@ -68,30 +62,8 @@ public class CreateHandlerTest {
     @BeforeEach
     public void setup() {
         handler = new CreateHandler();
-        macie2 = mock(Macie2Client.class);
         logger = new LoggerProxy();
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
-        proxyMacie2Client = new ProxyClient<Macie2Client>() {
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            ResponseT
-            injectCredentialsAndInvokeV2(RequestT request, Function<RequestT, ResponseT> requestFunction) {
-                return proxy.injectCredentialsAndInvokeV2(request, requestFunction);
-            }
-
-            @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-            CompletableFuture<ResponseT>
-            injectCredentialsAndInvokeV2Aync(RequestT request,
-                Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public Macie2Client client() {
-                return macie2;
-            }
-        };
     }
 
     @Test
@@ -103,8 +75,9 @@ public class CreateHandlerTest {
             .updatedAt(Instant.now())
             .serviceRole(String.format(SERVICE_ROLE, TEST_AWS_PARTITION, TEST_ACCOUNT_ID))
             .build();
-        when(macie2.enableMacie(any(EnableMacieRequest.class))).thenReturn(EnableMacieResponse.builder().build());
-        when(macie2.getMacieSession(any(GetMacieSessionRequest.class))).thenReturn(getMacieSessionResponse);
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(EnableMacieRequest.class), any())).thenReturn(EnableMacieResponse.builder().build());
+        lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetMacieSessionRequest.class), any())).thenReturn(getMacieSessionResponse);
 
         final ResourceModel desiredOutputModel = ResourceModel.builder()
             .awsAccountId(TEST_ACCOUNT_ID)
@@ -141,7 +114,8 @@ public class CreateHandlerTest {
                 .build()
             )
             .build();
-        when(macie2.enableMacie(any(EnableMacieRequest.class))).thenThrow(macieAlreadyEnabledException);
+        when(proxyMacie2Client.client()).thenReturn(macie2);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(EnableMacieRequest.class), any())).thenThrow(macieAlreadyEnabledException);
 
         final CreateHandler handler = new CreateHandler();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -154,10 +128,9 @@ public class CreateHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getMessage()).contains(MACIE_ALREADY_ENABLED_MESSAGE);
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.AlreadyExists);
+        assertThat(response.getMessage()).contains(String.format(MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
-        verify(macie2, times(1)).enableMacie(any(EnableMacieRequest.class));
     }
 }
