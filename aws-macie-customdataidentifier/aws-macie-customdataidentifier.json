@@ -98,13 +98,9 @@
         "macie2:GetCustomDataIdentifier"
       ]
     },
-    "update": {
-      "permissions": []
-    },
     "delete": {
       "permissions": [
-        "macie2:DeleteCustomDataIdentifier",
-        "macie2:GetCustomDataIdentifier"
+        "macie2:DeleteCustomDataIdentifier"
       ]
     },
     "list": {
