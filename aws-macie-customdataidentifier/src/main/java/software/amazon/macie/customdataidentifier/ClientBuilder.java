@@ -1,6 +1,5 @@
 package software.amazon.macie.customdataidentifier;
 
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.cloudformation.LambdaWrapper;
 
@@ -14,10 +13,5 @@ public class ClientBuilder {
                        .endpointOverride(override)
                        .httpClient(LambdaWrapper.HTTP_CLIENT)
                        .build();
-    /*
-    return Macie2Client.builder()
-                       .httpClient(LambdaWrapper.HTTP_CLIENT)
-                       .build();
-    */
   }
 }
