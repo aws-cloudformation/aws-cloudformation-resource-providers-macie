@@ -8,7 +8,7 @@
   "request": {
     "clientRequestToken": "1b11a1e1-b111-111b-a111-1ababa111aba",
     "desiredResourceState": {
-      "Id": "d82ddf42-888d-4004-b2bc-f879bf161926"
+      "Id": ""
     },
     "logicalResourceIdentifier": "MyCustomDataIdentifier"
   },
