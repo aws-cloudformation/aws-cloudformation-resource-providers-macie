@@ -37,7 +37,7 @@
       }
     },
     "Criterion": {
-      "description" : "Map of filter criteria.",
+      "description": "Map of filter criteria.",
       "type": "object",
       "patternProperties": {
         "\\w": {
@@ -61,7 +61,7 @@
       ]
     },
     "FilterListItem": {
-      "description" : "Returned by ListHandler representing filter name and ID.",
+      "description": "Returned by ListHandler representing filter name and ID.",
       "type": "object",
       "properties": {
         "filterId": {

@@ -12,7 +12,9 @@
       "findingCriteria": {
         "criterion": {
           "accountId": {
-            "eq": ["1234567890"]
+            "eq": [
+              "1234567890"
+            ]
           }
         }
       },

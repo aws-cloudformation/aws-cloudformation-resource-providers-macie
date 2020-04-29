@@ -13,7 +13,9 @@
       "findingCriteria": {
         "criterion": {
           "accountId": {
-            "neq": ["1234567890"]
+            "neq": [
+              "1234567890"
+            ]
           }
         }
       },

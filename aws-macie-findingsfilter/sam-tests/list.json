@@ -7,7 +7,7 @@
   "action": "LIST",
   "request": {
     "clientRequestToken": "",
-    "desiredResourceState": { },
+    "desiredResourceState": {},
     "logicalResourceIdentifier": "FindingsFilter"
   },
   "callbackContext": null
