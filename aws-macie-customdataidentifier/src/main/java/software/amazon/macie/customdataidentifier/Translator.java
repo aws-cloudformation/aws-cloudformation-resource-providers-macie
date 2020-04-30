@@ -37,25 +37,6 @@ public class Translator {
   }
 
   /**
-   * Translates resource object from sdk into a resource model
-   * @param request resource create request
-   * @param response resource create response
-   * @return model resource model
-   */
-  static ResourceModel translateFromCreateResponse(final CreateCustomDataIdentifierRequest request,
-                                                   final CreateCustomDataIdentifierResponse response) {
-    return ResourceModel.builder()
-                        .id(response.customDataIdentifierId())
-                        .name(request.name())
-                        .description(request.description())
-                        .ignoreWords(request.ignoreWords())
-                        .keywords(request.keywords())
-                        .maximumMatchDistance(request.maximumMatchDistance())
-                        .regex(request.regex())
-                        .build();
-  }
-
-  /**
    * Request to read a resource
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
