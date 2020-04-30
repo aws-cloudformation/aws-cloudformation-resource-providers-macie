@@ -7,6 +7,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
 import software.amazon.cloudformation.proxy.ProxyClient;
+import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -34,7 +35,8 @@ public class AbstractTestBase {
   ) {
     return new ProxyClient<Macie2Client>() {
       @Override
-      public <RequestT extends AwsRequest, ResponseT extends AwsResponse> ResponseT
+      public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
+      ResponseT
       injectCredentialsAndInvokeV2(RequestT request, Function<RequestT, ResponseT> requestFunction) {
         return proxy.injectCredentialsAndInvokeV2(request, requestFunction);
       }
@@ -42,8 +44,15 @@ public class AbstractTestBase {
       @Override
       public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
       CompletableFuture<ResponseT>
-      injectCredentialsAndInvokeV2Aync(RequestT request, Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
+      injectCredentialsAndInvokeV2Async(RequestT request, Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
         throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public <RequestT extends AwsRequest, ResponseT extends AwsResponse, IterableT extends SdkIterable<ResponseT>>
+      IterableT
+      injectCredentialsAndInvokeIterableV2(RequestT request, Function<RequestT, IterableT> requestFunction) {
+        return proxy.injectCredentialsAndInvokeIterableV2(request, requestFunction);
       }
 
       @Override
