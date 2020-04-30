@@ -12,12 +12,13 @@ import software.amazon.awssdk.services.macie2.model.CreateFindingsFilterRequest;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.awssdk.services.macie2.model.UpdateFindingsFilterRequest;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
-import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProgressEvent.ProgressEventBuilder;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
@@ -28,6 +29,8 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
     // Filter already exists returns 400
     protected final static String MACIE_NOT_ENABLED = "Macie is not enabled";
     protected final static String FILTER_ALREADY_EXISTS = "Filter name already exists. A unique name is required.";
+    protected static final String RESOURCE_EXISTS_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
+    protected static final String RESOURCE_MISSING_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private final static String RETRY_MESSAGE = "Detected retryable error, retrying. Exception message: %s";
     private final static String EXCEPTION_MESSAGE = "Exception occurred. Exception message: %s";
 
@@ -158,13 +161,22 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
         }
 
         logger.log(String.format(EXCEPTION_MESSAGE, ExceptionUtils.getStackTrace(exception)));
+        ProgressEventBuilder<ResourceModel, CallbackContext> failureProgressEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
+            .resourceModel(model)
+            .status(OperationStatus.FAILED);
         // Check of business exceptions
         if (macieNotEnabled(exception)) {
             throw new CfnAccessDeniedException(operation, exception);
         } else if (notFound(exception)) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, model.getFilterId(), exception);
+            return failureProgressEvent
+                .errorCode(HandlerErrorCode.NotFound)
+                .message(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()))
+                .build();
         } else if (exception.getMessage().contains(FILTER_ALREADY_EXISTS)) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, model.getName(), exception);
+            return failureProgressEvent
+                .errorCode(HandlerErrorCode.AlreadyExists)
+                .message(String.format(RESOURCE_EXISTS_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getName()))
+                .build();
         } else {
             throw new CfnGeneralServiceException(operation, exception);
         }

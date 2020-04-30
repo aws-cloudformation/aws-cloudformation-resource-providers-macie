@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_NOT_ENABLED;
+import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_NOT_ENABLED_EXPECTED_MESSAGE;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +34,6 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest {
     private static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
-    private static final String MACIE_NOT_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private static final String MACIE_NOT_ENABLED_CODE = "403";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/SERVICE-ROLE-NAME";
     private static final String TEST_ACCOUNT_ID = "999999999999";
@@ -119,7 +119,7 @@ public class ReadHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(MACIE_NOT_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

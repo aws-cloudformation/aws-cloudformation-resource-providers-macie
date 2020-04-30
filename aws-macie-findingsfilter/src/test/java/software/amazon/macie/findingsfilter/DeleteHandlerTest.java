@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.MACIE_NOT_ENABLED;
+import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.RESOURCE_MISSING_CFN_MESSAGE;
 import static software.amazon.macie.findingsfilter.DeleteHandler.OPERATION;
 
 import java.time.Duration;
@@ -36,7 +37,6 @@ public class DeleteHandlerTest {
     private static final String MACIE_NOT_ENABLED_HTTP_STATUS_CODE = "403";
     private static final String FILTER_MISSING_HTTP_STATUS_CODE = "404";
     private static final String FILTER_MISSING_MACIE_MESSAGE = "Resource not found. Verify any provided IDs are correct.";
-    private static final String RESOURCE_MISSING_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
     private static final String ACCESS_DENIED_CFN_MESSAGE = "Access denied for operation '%s'.";
 
     private final ResourceModel model = ResourceModel.builder()
@@ -104,7 +104,7 @@ public class DeleteHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()));
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

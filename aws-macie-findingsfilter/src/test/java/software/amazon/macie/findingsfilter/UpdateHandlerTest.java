@@ -7,6 +7,8 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.FILTER_ALREADY_EXISTS;
 import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.MACIE_NOT_ENABLED;
+import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.RESOURCE_EXISTS_CFN_MESSAGE;
+import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.RESOURCE_MISSING_CFN_MESSAGE;
 import static software.amazon.macie.findingsfilter.UpdateHandler.OPERATION;
 
 import com.google.common.collect.ImmutableList;
@@ -51,8 +53,6 @@ public class UpdateHandlerTest {
     private static final String FILTER_ALREADY_EXISTS_HTTP_STATUS_CODE = "400";
     private static final String FILTER_MISSING_HTTP_STATUS_CODE = "404";
     private static final String FILTER_MISSING_MACIE_MESSAGE = "Resource not found. Verify any provided IDs are correct.";
-    private static final String RESOURCE_MISSING_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
-    private static final String RESOURCE_EXISTS_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     private static final String ACCESS_DENIED_CFN_MESSAGE = "Access denied for operation '%s'.";
 
     private final ResourceModel model = ResourceModel.builder()
@@ -160,7 +160,7 @@ public class UpdateHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()));
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }
@@ -187,7 +187,7 @@ public class UpdateHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(RESOURCE_EXISTS_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getName()));
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.AlreadyExists);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }
