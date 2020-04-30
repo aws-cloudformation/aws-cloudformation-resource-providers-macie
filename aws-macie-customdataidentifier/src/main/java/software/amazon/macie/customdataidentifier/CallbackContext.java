@@ -1,14 +1,10 @@
 package software.amazon.macie.customdataidentifier;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import software.amazon.cloudformation.proxy.StdCallbackContext;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CallbackContext {
-    private String customDataIdentifierId;
+@lombok.Getter
+@lombok.Setter
+@lombok.ToString
+@lombok.EqualsAndHashCode(callSuper = true)
+public class CallbackContext extends StdCallbackContext {
 }

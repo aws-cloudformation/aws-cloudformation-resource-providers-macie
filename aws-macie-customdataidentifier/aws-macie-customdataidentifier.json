@@ -1,7 +1,7 @@
 {
   "typeName": "AWS::Macie::CustomDataIdentifier",
   "description": "Macie CustomDataIdentifier resource schema",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-macie.git",
   "properties": {
     "Name": {
       "description": "Name of custom data identifier.",
@@ -55,10 +55,11 @@
       "type": "boolean"
     }
   },
-  "additionalProperties": false,
   "required": [
-    "Name"
+    "/properties/Name",
+    "/properties/Regex"
   ],
+  "additionalProperties": false,
   "createOnlyProperties": [
     "/properties/Name",
     "/properties/ResourceId",
@@ -74,6 +75,9 @@
     "/properties/CreatedAt",
     "/properties/Deleted"
   ],
+  "writeOnlyProperties": [
+    "/properties/ResourceId"
+  ],
   "primaryIdentifier": [
     "/properties/Id"
   ],
@@ -86,7 +90,7 @@
     "create": {
       "permissions": [
         "macie2:CreateCustomDataIdentifier",
-        "macie2:ListCustomDataIdentifiers"
+        "macie2:GetCustomDataIdentifier"
       ]
     },
     "read": {
