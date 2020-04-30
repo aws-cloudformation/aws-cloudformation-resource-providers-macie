@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_ALREADY_ENABLED;
+import static software.amazon.macie.session.BaseMacieSessionHandler.MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -38,7 +39,6 @@ public class CreateHandlerTest {
 
     private static final Credentials MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
     private static final String MACIE_ALREADY_ENABLED_CODE = "409";
-    private static final String MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     private static final String SERVICE_ROLE = "arn:%s:iam::%s:role/aws-service-role/macie.amazonaws.com/AWSServiceRoleForAmazonMacie";
     private static final String CLIENT_TOKEN = "CLIENT_TOKEN";
     private static final String TEST_ACCOUNT_ID = "999999999999";
@@ -129,7 +129,7 @@ public class CreateHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InternalFailure);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.AlreadyExists);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

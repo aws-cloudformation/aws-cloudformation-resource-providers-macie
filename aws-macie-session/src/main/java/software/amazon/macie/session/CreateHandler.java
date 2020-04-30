@@ -40,7 +40,7 @@ public class CreateHandler extends BaseMacieSessionHandler {
             // Ensure all requisite resources are created and we can query Macie session
             .stabilize(this::stabilize)
             // return appropriate failed progress event status by mapping business exceptions.
-            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, _exception, _model))
+            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, _exception, _model, _context, logger))
             // Once ACTIVE return progress
             .progress()
             // we then delegate to ReadHandler to read the live state and send back successful response.
