@@ -131,6 +131,7 @@ public class UpdateHandlerTest {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(MACIE_NOT_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+        assertThat(response.getResourceModel()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

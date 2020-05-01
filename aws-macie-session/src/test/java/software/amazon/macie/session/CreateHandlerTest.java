@@ -130,6 +130,7 @@ public class CreateHandlerTest {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getMessage()).contains(String.format(MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE, ResourceModel.TYPE_NAME, model.getAwsAccountId()));
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.AlreadyExists);
+        assertThat(response.getResourceModel()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }
