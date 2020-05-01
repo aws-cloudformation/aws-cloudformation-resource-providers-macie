@@ -58,7 +58,6 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
 
         logger.log(String.format(EXCEPTION_MESSAGE, ExceptionUtils.getStackTrace(exception)));
         ProgressEventBuilder<ResourceModel, CallbackContext> failureProgressEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model)
             .status(OperationStatus.FAILED);
         if (exception.getMessage().contains(MACIE_NOT_ENABLED)) {
             return failureProgressEvent

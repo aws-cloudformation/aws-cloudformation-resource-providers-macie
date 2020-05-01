@@ -162,8 +162,8 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
 
         logger.log(String.format(EXCEPTION_MESSAGE, ExceptionUtils.getStackTrace(exception)));
         ProgressEventBuilder<ResourceModel, CallbackContext> failureProgressEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model)
             .status(OperationStatus.FAILED);
+
         // Check of business exceptions
         if (macieNotEnabled(exception)) {
             throw new CfnAccessDeniedException(operation, exception);
