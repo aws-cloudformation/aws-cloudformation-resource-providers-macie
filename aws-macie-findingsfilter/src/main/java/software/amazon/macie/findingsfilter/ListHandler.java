@@ -1,7 +1,5 @@
 package software.amazon.macie.findingsfilter;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersRequest;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersResponse;
@@ -11,6 +9,9 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ListHandler extends BaseMacieFindingFilterHandler {
 
@@ -46,10 +47,10 @@ public class ListHandler extends BaseMacieFindingFilterHandler {
     private ProgressEvent<ResourceModel, CallbackContext> buildModelFromResponse(ListFindingsFiltersRequest request,
         ListFindingsFiltersResponse response,
         ProxyClient<Macie2Client> clientProxyClient, ResourceModel model, CallbackContext context) {
-        List<FilterListItem> filterListItems = response.findingsFilterListItems().stream()
-            .map(item -> FilterListItem.builder().filterId(item.filterId()).name(item.name()).build())
+        List<FindingsFilterListItem> filterListItems = response.findingsFilterListItems().stream()
+            .map(item -> FindingsFilterListItem.builder().filterId(item.filterId()).name(item.name()).build())
             .collect(Collectors.toList());
-        model.setFilterListItems(filterListItems);
+        model.setFindingsFilterListItems(filterListItems);
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
             .status(OperationStatus.SUCCESS)
             .resourceModel(model)

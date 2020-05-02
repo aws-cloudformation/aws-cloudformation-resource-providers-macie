@@ -1,13 +1,6 @@
 package software.amazon.macie.findingsfilter;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.MACIE_NOT_ENABLED;
-import static software.amazon.macie.findingsfilter.ListHandler.OPERATION;
-
 import com.google.common.collect.ImmutableList;
-import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +10,6 @@ import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.macie2.Macie2Client;
-import software.amazon.awssdk.services.macie2.model.FilterListItem;
 import software.amazon.awssdk.services.macie2.model.FindingsFilterListItem;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersRequest;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersResponse;
@@ -30,6 +22,14 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static software.amazon.macie.findingsfilter.BaseMacieFindingFilterHandler.MACIE_NOT_ENABLED;
+import static software.amazon.macie.findingsfilter.ListHandler.OPERATION;
 
 @ExtendWith(MockitoExtension.class)
 public class ListHandlerTest {
@@ -70,7 +70,7 @@ public class ListHandlerTest {
         when(proxyMacie2Client
             .injectCredentialsAndInvokeV2(any(ListFindingsFiltersRequest.class), any())).thenReturn(listFindingsFiltersResponse);
         final ResourceModel desiredOutputModel = ResourceModel.builder()
-            .filterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FilterListItem.builder()
+            .findingsFilterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FindingsFilterListItem.builder()
                 .name(FILTER_NAME)
                 .filterId(FILTER_ID)
                 .build()))
@@ -105,7 +105,7 @@ public class ListHandlerTest {
         when(proxyMacie2Client
             .injectCredentialsAndInvokeV2(any(ListFindingsFiltersRequest.class), any())).thenReturn(listFindingsFiltersResponse);
         final ResourceModel desiredOutputModel = ResourceModel.builder()
-            .filterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FilterListItem.builder()
+            .findingsFilterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FindingsFilterListItem.builder()
                 .name(FILTER_NAME)
                 .filterId(FILTER_ID)
                 .build()))
@@ -137,7 +137,7 @@ public class ListHandlerTest {
             .injectCredentialsAndInvokeV2(any(ListFindingsFiltersRequest.class), any())).thenReturn(listFindingsFiltersResponse);
 
         final ResourceModel desiredOutputModel = ResourceModel.builder()
-            .filterListItems(ImmutableList.of()).build();
+            .findingsFilterListItems(ImmutableList.of()).build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
             .build();

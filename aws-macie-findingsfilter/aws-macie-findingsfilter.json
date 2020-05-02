@@ -60,7 +60,7 @@
         "NOOP"
       ]
     },
-    "FilterListItem": {
+    "FindingsFilterListItem": {
       "description": "Returned by ListHandler representing filter name and ID.",
       "type": "object",
       "properties": {
@@ -102,11 +102,11 @@
       "description": "Findings filter ARN.",
       "type": "string"
     },
-    "FilterListItems": {
+    "FindingsFilterListItems": {
       "description": "Findings filters list.",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/FilterListItem"
+        "$ref": "#/definitions/FindingsFilterListItem"
       }
     }
   },
@@ -114,7 +114,7 @@
   "readOnlyProperties": [
     "/properties/FilterId",
     "/properties/Arn",
-    "/properties/FilterListItems"
+    "/properties/FindingsFilterListItems"
   ],
   "primaryIdentifier": [
     "/properties/FilterId"
