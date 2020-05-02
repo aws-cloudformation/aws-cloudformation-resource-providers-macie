@@ -18,6 +18,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.FilterListItem;
+import software.amazon.awssdk.services.macie2.model.FindingsFilterListItem;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersRequest;
 import software.amazon.awssdk.services.macie2.model.ListFindingsFiltersResponse;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
@@ -60,10 +61,10 @@ public class ListHandlerTest {
     @Test
     public void handleRequest_SimpleSuccess() {
         ListFindingsFiltersResponse listFindingsFiltersResponse = ListFindingsFiltersResponse.builder()
-            .filterListItems(ImmutableList.of(FilterListItem.builder()
-                .name(FILTER_NAME)
-                .filterId(FILTER_ID)
-                .build()))
+            .findingsFilterListItems(ImmutableList.of(FindingsFilterListItem.builder()
+                                                                           .name(FILTER_NAME)
+                                                                           .filterId(FILTER_ID)
+                                                                           .build()))
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
         when(proxyMacie2Client
@@ -94,10 +95,10 @@ public class ListHandlerTest {
     @Test
     public void handleRequest_SimpleSuccess_nextToken() {
         ListFindingsFiltersResponse listFindingsFiltersResponse = ListFindingsFiltersResponse.builder()
-            .filterListItems(ImmutableList.of(FilterListItem.builder()
-                .name(FILTER_NAME)
-                .filterId(FILTER_ID)
-                .build()))
+            .findingsFilterListItems(ImmutableList.of(FindingsFilterListItem.builder()
+                                                                           .name(FILTER_NAME)
+                                                                           .filterId(FILTER_ID)
+                                                                           .build()))
             .nextToken(NEXT_TOKEN)
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
@@ -130,7 +131,7 @@ public class ListHandlerTest {
     @Test
     public void handleRequest_SimpleSuccess_Empty() {
         ListFindingsFiltersResponse listFindingsFiltersResponse = ListFindingsFiltersResponse.builder()
-            .filterListItems(ImmutableList.of()).build();
+            .findingsFilterListItems(ImmutableList.of()).build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
         when(proxyMacie2Client
             .injectCredentialsAndInvokeV2(any(ListFindingsFiltersRequest.class), any())).thenReturn(listFindingsFiltersResponse);

@@ -46,7 +46,7 @@ public class ListHandler extends BaseMacieFindingFilterHandler {
     private ProgressEvent<ResourceModel, CallbackContext> buildModelFromResponse(ListFindingsFiltersRequest request,
         ListFindingsFiltersResponse response,
         ProxyClient<Macie2Client> clientProxyClient, ResourceModel model, CallbackContext context) {
-        List<FilterListItem> filterListItems = response.filterListItems().stream()
+        List<FilterListItem> filterListItems = response.findingsFilterListItems().stream()
             .map(item -> FilterListItem.builder().filterId(item.filterId()).name(item.name()).build())
             .collect(Collectors.toList());
         model.setFilterListItems(filterListItems);
