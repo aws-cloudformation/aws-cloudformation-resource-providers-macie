@@ -19,8 +19,8 @@ import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.macie2.Macie2Client;
-import software.amazon.awssdk.services.macie2.model.DescribeFindingsFilterRequest;
-import software.amazon.awssdk.services.macie2.model.DescribeFindingsFilterResponse;
+import software.amazon.awssdk.services.macie2.model.GetFindingsFilterRequest;
+import software.amazon.awssdk.services.macie2.model.GetFindingsFilterResponse;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
@@ -49,7 +49,7 @@ public class ReadHandlerTest {
     private static final String ACCESS_DENIED_CFN_MESSAGE = "Access denied for operation '%s'.";
 
     private final ResourceModel model = ResourceModel.builder()
-        .filterId(FILTER_ID)
+        .id(FILTER_ID)
         .build();
     @Mock
     private ProxyClient<Macie2Client> proxyMacie2Client;
@@ -70,8 +70,8 @@ public class ReadHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        DescribeFindingsFilterResponse findingsFilterResponse = DescribeFindingsFilterResponse.builder()
-            .filterId(FILTER_ID)
+        GetFindingsFilterResponse findingsFilterResponse = GetFindingsFilterResponse.builder()
+            .id(FILTER_ID)
             .arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID))
             .name(FILTER_NAME)
             .description(FILTER_DESCRIPTION)
@@ -86,9 +86,9 @@ public class ReadHandlerTest {
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
         when(proxyMacie2Client
-            .injectCredentialsAndInvokeV2(any(DescribeFindingsFilterRequest.class), any())).thenReturn(findingsFilterResponse);
+            .injectCredentialsAndInvokeV2(any(GetFindingsFilterRequest.class), any())).thenReturn(findingsFilterResponse);
         final ResourceModel desiredOutputModel = ResourceModel.builder()
-            .filterId(FILTER_ID)
+            .id(FILTER_ID)
             .arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID))
             .name(FILTER_NAME)
             .description(FILTER_DESCRIPTION)
@@ -130,7 +130,7 @@ public class ReadHandlerTest {
             )
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
-        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(DescribeFindingsFilterRequest.class), any())).thenThrow(filterNotFoundException);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetFindingsFilterRequest.class), any())).thenThrow(filterNotFoundException);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
@@ -140,7 +140,7 @@ public class ReadHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()));
+        assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getId()));
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
         assertThat(response.getResourceModel()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
@@ -159,7 +159,7 @@ public class ReadHandlerTest {
             )
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
-        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(DescribeFindingsFilterRequest.class), any())).thenThrow(macieNotEnabledException);
+        when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(GetFindingsFilterRequest.class), any())).thenThrow(macieNotEnabledException);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
