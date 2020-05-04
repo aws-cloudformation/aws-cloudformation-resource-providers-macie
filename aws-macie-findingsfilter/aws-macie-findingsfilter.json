@@ -48,7 +48,7 @@
     "FindingCriteria": {
       "type": "object",
       "properties": {
-        "criterion": {
+        "Criterion": {
           "$ref": "#/definitions/Criterion"
         }
       }
@@ -64,10 +64,10 @@
       "description": "Returned by ListHandler representing filter name and ID.",
       "type": "object",
       "properties": {
-        "filterId": {
+        "Id": {
           "type": "string"
         },
-        "name": {
+        "Name": {
           "type": "string"
         }
       }
@@ -94,7 +94,7 @@
       "description": "Findings filter position.",
       "type": "integer"
     },
-    "FilterId": {
+    "Id": {
       "description": "Findings filter ID.",
       "type": "string"
     },
@@ -112,12 +112,12 @@
   },
   "additionalProperties": false,
   "readOnlyProperties": [
-    "/properties/FilterId",
+    "/properties/Id",
     "/properties/Arn",
     "/properties/FindingsFilterListItems"
   ],
   "primaryIdentifier": [
-    "/properties/FilterId"
+    "/properties/Id"
   ],
   "additionalIdentifiers": [
     [
@@ -130,18 +130,18 @@
   "handlers": {
     "create": {
       "permissions": [
-        "macie:DescribeFindingsFilter",
+        "macie:GetFindingsFilter",
         "macie:CreateFindingsFilter"
       ]
     },
     "read": {
       "permissions": [
-        "macie:DescribeFindingsFilter"
+        "macie:GetFindingsFilter"
       ]
     },
     "update": {
       "permissions": [
-        "macie:DescribeFindingsFilter",
+        "macie:GetFindingsFilter",
         "macie:UpdateFindingsFilter"
       ]
     },

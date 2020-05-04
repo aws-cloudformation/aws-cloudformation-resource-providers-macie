@@ -68,7 +68,7 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
 
     protected UpdateFindingsFilterRequest updateFindingFilterRequest(final ResourceModel model) {
         return UpdateFindingsFilterRequest.builder()
-            .filterId(model.getFilterId())
+            .id(model.getId())
             .name(model.getName())
             .description(model.getDescription())
             .findingCriteria(macieSdkFindingCriteria(model))
@@ -170,7 +170,7 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
         } else if (notFound(exception)) {
             return failureProgressEvent
                 .errorCode(HandlerErrorCode.NotFound)
-                .message(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()))
+                .message(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getId()))
                 .build();
         } else if (exception.getMessage().contains(FILTER_ALREADY_EXISTS)) {
             return failureProgressEvent

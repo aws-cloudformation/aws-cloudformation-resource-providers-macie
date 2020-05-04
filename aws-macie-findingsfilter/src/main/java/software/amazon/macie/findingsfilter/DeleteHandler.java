@@ -27,7 +27,7 @@ public class DeleteHandler extends BaseMacieFindingFilterHandler {
         return proxy.initiate(OPERATION, client, model, callbackContext)
             // transform Resource model properties to DeleteFindingsFilter API
             .translateToServiceRequest((m) -> DeleteFindingsFilterRequest.builder()
-                .filterId(model.getFilterId())
+                .id(model.getId())
                 .build())
             // Make a service call. Handler does not worry about credentials, they are auto injected
             .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::deleteFindingsFilter))

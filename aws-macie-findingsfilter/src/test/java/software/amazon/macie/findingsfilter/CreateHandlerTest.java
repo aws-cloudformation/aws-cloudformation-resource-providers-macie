@@ -24,8 +24,8 @@ import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.CreateFindingsFilterRequest;
 import software.amazon.awssdk.services.macie2.model.CreateFindingsFilterResponse;
-import software.amazon.awssdk.services.macie2.model.DescribeFindingsFilterRequest;
-import software.amazon.awssdk.services.macie2.model.DescribeFindingsFilterResponse;
+import software.amazon.awssdk.services.macie2.model.GetFindingsFilterRequest;
+import software.amazon.awssdk.services.macie2.model.GetFindingsFilterResponse;
 import software.amazon.awssdk.services.macie2.model.Macie2Exception;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
@@ -82,8 +82,8 @@ public class CreateHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        DescribeFindingsFilterResponse findingsFilterResponse = DescribeFindingsFilterResponse.builder()
-            .filterId(FILTER_ID)
+        GetFindingsFilterResponse findingsFilterResponse = GetFindingsFilterResponse.builder()
+            .id(FILTER_ID)
             .arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID))
             .name(FILTER_NAME)
             .description(FILTER_DESCRIPTION)
@@ -98,17 +98,17 @@ public class CreateHandlerTest {
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
         lenient().when(proxyMacie2Client.injectCredentialsAndInvokeV2(any(CreateFindingsFilterRequest.class), any())).thenReturn(
-            CreateFindingsFilterResponse.builder().filterId(FILTER_ID).arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID)).build());
+            CreateFindingsFilterResponse.builder().id(FILTER_ID).arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID)).build());
 
-        // Ensure filterId returned by create is set for subsequent read
+        // Ensure id returned by create is set for subsequent read
         lenient().when(proxyMacie2Client
             .injectCredentialsAndInvokeV2(argThat(
-                awsRequest -> awsRequest instanceof DescribeFindingsFilterRequest && ((DescribeFindingsFilterRequest) awsRequest).filterId()
+                awsRequest -> awsRequest instanceof GetFindingsFilterRequest && ((GetFindingsFilterRequest) awsRequest).id()
                     .equalsIgnoreCase(FILTER_ID)), any()))
             .thenReturn(findingsFilterResponse);
 
         final ResourceModel desiredOutputModel = ResourceModel.builder()
-            .filterId(FILTER_ID)
+            .id(FILTER_ID)
             .arn(String.format(FILTER_ARN, TEST_ACCOUNT_ID, FILTER_ID))
             .name(FILTER_NAME)
             .description(FILTER_DESCRIPTION)

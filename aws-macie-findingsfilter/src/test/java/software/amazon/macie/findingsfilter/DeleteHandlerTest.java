@@ -40,7 +40,7 @@ public class DeleteHandlerTest {
     private static final String ACCESS_DENIED_CFN_MESSAGE = "Access denied for operation '%s'.";
 
     private final ResourceModel model = ResourceModel.builder()
-        .filterId(FILTER_ID)
+        .id(FILTER_ID)
         .build();
     @Mock
     private ProxyClient<Macie2Client> proxyMacie2Client;
@@ -103,7 +103,7 @@ public class DeleteHandlerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getFilterId()));
+        assertThat(response.getMessage()).contains(String.format(RESOURCE_MISSING_CFN_MESSAGE, ResourceModel.TYPE_NAME, model.getId()));
         assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
         assertThat(response.getResourceModel()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
