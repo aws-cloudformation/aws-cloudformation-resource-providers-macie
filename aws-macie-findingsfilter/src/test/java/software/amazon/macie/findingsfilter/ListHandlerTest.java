@@ -63,7 +63,7 @@ public class ListHandlerTest {
         ListFindingsFiltersResponse listFindingsFiltersResponse = ListFindingsFiltersResponse.builder()
             .findingsFilterListItems(ImmutableList.of(FindingsFilterListItem.builder()
                                                                            .name(FILTER_NAME)
-                                                                           .filterId(FILTER_ID)
+                                                                           .id(FILTER_ID)
                                                                            .build()))
             .build();
         when(proxyMacie2Client.client()).thenReturn(macie2);
@@ -72,7 +72,7 @@ public class ListHandlerTest {
         final ResourceModel desiredOutputModel = ResourceModel.builder()
             .findingsFilterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FindingsFilterListItem.builder()
                 .name(FILTER_NAME)
-                .filterId(FILTER_ID)
+                .id(FILTER_ID)
                 .build()))
             .build();
 
@@ -97,7 +97,7 @@ public class ListHandlerTest {
         ListFindingsFiltersResponse listFindingsFiltersResponse = ListFindingsFiltersResponse.builder()
             .findingsFilterListItems(ImmutableList.of(FindingsFilterListItem.builder()
                                                                            .name(FILTER_NAME)
-                                                                           .filterId(FILTER_ID)
+                                                                           .id(FILTER_ID)
                                                                            .build()))
             .nextToken(NEXT_TOKEN)
             .build();
@@ -107,7 +107,7 @@ public class ListHandlerTest {
         final ResourceModel desiredOutputModel = ResourceModel.builder()
             .findingsFilterListItems(ImmutableList.of(software.amazon.macie.findingsfilter.FindingsFilterListItem.builder()
                 .name(FILTER_NAME)
-                .filterId(FILTER_ID)
+                .id(FILTER_ID)
                 .build()))
             .build();
 

@@ -32,7 +32,6 @@ public class Translator {
                                            .keywords(model.getKeywords())
                                            .maximumMatchDistance(model.getMaximumMatchDistance())
                                            .regex(model.getRegex())
-                                           .resourceId(model.getResourceId())
                                            .build();
   }
 

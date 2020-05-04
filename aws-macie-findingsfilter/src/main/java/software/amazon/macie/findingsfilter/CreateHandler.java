@@ -43,7 +43,7 @@ public class CreateHandler extends BaseMacieFindingFilterHandler {
         final CreateFindingsFilterResponse response, final ProxyClient<Macie2Client> clientProxyClient, final ResourceModel model,
         final CallbackContext callbackContext) {
 
-        model.setFilterId(response.filterId());
+        model.setId(response.id());
         model.setArn(response.arn());
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
             .resourceModel(model)

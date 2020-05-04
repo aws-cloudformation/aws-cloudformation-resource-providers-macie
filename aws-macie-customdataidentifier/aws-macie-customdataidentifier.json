@@ -7,10 +7,6 @@
       "description": "Name of custom data identifier.",
       "type": "string"
     },
-    "ResourceId": {
-      "description": "Resource ID for custom data identifier.",
-      "type": "string"
-    },
     "Description": {
       "description": "Description of custom data identifier.",
       "type": "string"
@@ -62,7 +58,6 @@
   "additionalProperties": false,
   "createOnlyProperties": [
     "/properties/Name",
-    "/properties/ResourceId",
     "/properties/Description",
     "/properties/Regex",
     "/properties/MaximumMatchDistance",
@@ -74,9 +69,6 @@
     "/properties/Arn",
     "/properties/CreatedAt",
     "/properties/Deleted"
-  ],
-  "writeOnlyProperties": [
-    "/properties/ResourceId"
   ],
   "primaryIdentifier": [
     "/properties/Id"

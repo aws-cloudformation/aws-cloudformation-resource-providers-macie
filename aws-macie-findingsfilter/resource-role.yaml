@@ -25,7 +25,7 @@ Resources:
                 Action:
                 - "macie:CreateFindingsFilter"
                 - "macie:DeleteFindingsFilter"
-                - "macie:DescribeFindingsFilter"
+                - "macie:GetFindingsFilter"
                 - "macie:ListFindingsFilters"
                 - "macie:UpdateFindingsFilter"
                 Resource: "*"
