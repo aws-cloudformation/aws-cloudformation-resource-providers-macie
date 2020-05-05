@@ -130,29 +130,29 @@
   "handlers": {
     "create": {
       "permissions": [
-        "macie:GetFindingsFilter",
-        "macie:CreateFindingsFilter"
+        "macie2:GetFindingsFilter",
+        "macie2:CreateFindingsFilter"
       ]
     },
     "read": {
       "permissions": [
-        "macie:GetFindingsFilter"
+        "macie2:GetFindingsFilter"
       ]
     },
     "update": {
       "permissions": [
-        "macie:GetFindingsFilter",
-        "macie:UpdateFindingsFilter"
+        "macie2:GetFindingsFilter",
+        "macie2:UpdateFindingsFilter"
       ]
     },
     "delete": {
       "permissions": [
-        "macie:DeleteFindingsFilter"
+        "macie2:DeleteFindingsFilter"
       ]
     },
     "list": {
       "permissions": [
-        "macie:ListFindingsFilters"
+        "macie2:ListFindingsFilters"
       ]
     }
   }
