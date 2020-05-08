@@ -31,8 +31,8 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
     protected final static String FILTER_ALREADY_EXISTS = "Filter name already exists. A unique name is required.";
     protected static final String RESOURCE_EXISTS_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     protected static final String RESOURCE_MISSING_CFN_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
-    private final static String RETRY_MESSAGE = "Detected retryable error, retrying. Exception message: %s";
-    private final static String EXCEPTION_MESSAGE = "Exception occurred. Exception message: %s";
+    private final static String RETRY_MESSAGE = "Detected retryable error for AWS account id [%s], retrying. Exception message: %s";
+    private final static String EXCEPTION_MESSAGE = "Exception occurred for AWS account id [%s]. Exception message: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(AmazonWebServicesClientProxy proxy,
@@ -152,15 +152,16 @@ public abstract class BaseMacieFindingFilterHandler extends BaseHandler<Callback
             && ((Macie2Exception) exception).awsErrorDetails().sdkHttpResponse().statusCode() == HttpStatus.SC_NOT_FOUND;
     }
 
-    protected ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation, final Exception exception, final ResourceModel model,
+    protected ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation,
+        ResourceHandlerRequest<ResourceModel> request, final Exception exception, final ResourceModel model,
         final CallbackContext context, final Logger logger) {
         // All InternalServerExceptions are retryable
         if (retryError(exception)) {
-            logger.log(String.format(RETRY_MESSAGE, exception.getMessage()));
+            logger.log(String.format(RETRY_MESSAGE, request.getAwsAccountId(), exception.getMessage()));
             return ProgressEvent.progress(model, context);
         }
 
-        logger.log(String.format(EXCEPTION_MESSAGE, ExceptionUtils.getStackTrace(exception)));
+        logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(exception)));
         ProgressEventBuilder<ResourceModel, CallbackContext> failureProgressEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
             .status(OperationStatus.FAILED);
 

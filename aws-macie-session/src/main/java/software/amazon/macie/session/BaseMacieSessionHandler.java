@@ -22,8 +22,8 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
     protected final static String MACIE_ALREADY_ENABLED = "Macie has already been enabled";
     protected static final String MACIE_ALREADY_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' already exists.";
     protected static final String MACIE_NOT_ENABLED_EXPECTED_MESSAGE = "Resource of type '%s' with identifier '%s' was not found.";
-    private final static String RETRY_MESSAGE = "Detected retryable error, retrying. Exception message: %s";
-    private final static String EXCEPTION_MESSAGE = "Exception occurred. Exception message: %s";
+    private final static String RETRY_MESSAGE = "Detected retryable error for AWS account id [%s], retrying. Exception message: %s";
+    private final static String EXCEPTION_MESSAGE = "Exception occurred for AWS account id [%s]. Exception message: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(AmazonWebServicesClientProxy proxy,
@@ -48,15 +48,17 @@ public abstract class BaseMacieSessionHandler extends BaseHandler<CallbackContex
             && ((Macie2Exception) exception).awsErrorDetails().sdkHttpResponse().statusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR;
     }
 
-    public ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation, final Exception exception, final ResourceModel model,
+    public ProgressEvent<ResourceModel, CallbackContext> handleError(final String operation,
+        ResourceHandlerRequest<ResourceModel> request, final Exception exception,
+        final ResourceModel model,
         CallbackContext context, Logger logger) {
         // All InternalServerExceptions are retryable
         if (retryError(exception)) {
-            logger.log(String.format(RETRY_MESSAGE, exception.getMessage()));
+            logger.log(String.format(RETRY_MESSAGE, request.getAwsAccountId(), exception.getMessage()));
             return ProgressEvent.progress(model, context);
         }
 
-        logger.log(String.format(EXCEPTION_MESSAGE, ExceptionUtils.getStackTrace(exception)));
+        logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(exception)));
         ProgressEventBuilder<ResourceModel, CallbackContext> failureProgressEvent = ProgressEvent.<ResourceModel, CallbackContext>builder()
             .status(OperationStatus.FAILED);
         if (exception.getMessage().contains(MACIE_NOT_ENABLED)) {

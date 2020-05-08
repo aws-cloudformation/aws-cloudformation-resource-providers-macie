@@ -81,6 +81,7 @@ public class Translator {
    * @return awsRequest the aws service request to describe resources within aws account
    */
   static ListCustomDataIdentifiersRequest translateToListRequest(final String nextToken) {
+    System.out.println("###translateToListRequest");
     return ListCustomDataIdentifiersRequest.builder().maxResults(LIST_CDIS_MAX_RESULTS).nextToken(nextToken).build();
   }
 }

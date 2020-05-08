@@ -39,7 +39,7 @@ public class ListHandler extends BaseMacieFindingFilterHandler {
             // Make a service call. Handler does not worry about credentials, they are auto injected
             .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::listFindingsFilters))
             // return appropriate failed progress event status by mapping business exceptions.
-            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, _exception, _model, _context, logger))
+            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, request, _exception, _model, _context, logger))
             // build model from successful response
             .done(this::buildModelFromResponse);
     }

@@ -42,6 +42,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "macie2:GetMacieSession",
         "macie2:EnableMacie"
       ]
     },
