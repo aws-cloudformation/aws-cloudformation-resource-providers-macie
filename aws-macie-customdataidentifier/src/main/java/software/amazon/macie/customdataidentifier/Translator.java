@@ -1,7 +1,6 @@
 package software.amazon.macie.customdataidentifier;
 
 import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierRequest;
-import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierResponse;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierResponse;
@@ -81,7 +80,6 @@ public class Translator {
    * @return awsRequest the aws service request to describe resources within aws account
    */
   static ListCustomDataIdentifiersRequest translateToListRequest(final String nextToken) {
-    System.out.println("###translateToListRequest");
     return ListCustomDataIdentifiersRequest.builder().maxResults(LIST_CDIS_MAX_RESULTS).nextToken(nextToken).build();
   }
 }

@@ -31,7 +31,6 @@ public class ListHandler extends BaseHandlerStd {
     ) {
         this.logger = logger;
         this.request = request;
-        System.out.println("#####");
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -60,8 +59,6 @@ public class ListHandler extends BaseHandlerStd {
     ) {
         ListCustomDataIdentifiersResponse response;
         try {
-            System.out.println("###proxyClient:"+proxyClient);
-            System.out.println("###proxyClient.client():"+proxyClient.client());
             response = proxyClient.injectCredentialsAndInvokeV2(listCustomDataIdentifiersRequest, proxyClient.client()::listCustomDataIdentifiers);
         } catch (final Macie2Exception e) {
             logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
