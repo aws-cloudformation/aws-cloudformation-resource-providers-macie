@@ -33,7 +33,7 @@ public class UpdateHandler extends BaseMacieSessionHandler {
             // Make a service call. Handler does not worry about credentials, they are auto injected
             .makeServiceCall((r, c) -> c.injectCredentialsAndInvokeV2(r, c.client()::updateMacieSession))
             // return appropriate failed progress event status by mapping business exceptions.
-            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, _exception, _model, _context, logger))
+            .handleError((_request, _exception, _client, _model, _context) -> handleError(OPERATION, request, _exception, _model, _context, logger))
             // Once ACTIVE return progress
             .progress()
             // we then delegate to ReadHandler to read the live state and send back successful response.

@@ -1,5 +1,6 @@
 package software.amazon.macie.customdataidentifier;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierResponse;
@@ -15,6 +16,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class ReadHandler extends BaseHandlerStd {
     private Logger logger;
+    private ResourceHandlerRequest<ResourceModel> request;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
@@ -24,6 +26,7 @@ public class ReadHandler extends BaseHandlerStd {
         final Logger logger
     ) {
         this.logger = logger;
+        this.request = request;
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -41,22 +44,24 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     /**
-     * Implement client invocation of the read request through the proxyClient, which is already initialised with
+     * Implement client invocation of the read getCustomDataIdentifierRequest through the proxyClient, which is already initialised with
      * caller credentials, correct region and retry settings
-     * @param request the aws service request to describe a resource
+     * @param getCustomDataIdentifierRequest the aws service getCustomDataIdentifierRequest to describe a resource
      * @param proxyClient the aws service client to make the call
      * @return describe resource response
      */
     private GetCustomDataIdentifierResponse readResource(
-        final GetCustomDataIdentifierRequest request,
+        final GetCustomDataIdentifierRequest getCustomDataIdentifierRequest,
         final ProxyClient<Macie2Client> proxyClient
     ) {
         GetCustomDataIdentifierResponse response;
         try {
-            response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getCustomDataIdentifier);
+            response = proxyClient.injectCredentialsAndInvokeV2(getCustomDataIdentifierRequest, proxyClient.client()::getCustomDataIdentifier);
         } catch (final ResourceNotFoundException e) {
+            logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage());
         } catch (final Macie2Exception e) {
+            logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
 
@@ -65,8 +70,7 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     /**
-     * Implement client invocation of the read request through the proxyClient, which is already initialised with
-     * caller credentials, correct region and retry settings
+     * Build the Progress Event object from SDK response.
      * @param response the aws service describe resource response
      * @return progressEvent indicating success, in progress with delay callback or failed state
      */
