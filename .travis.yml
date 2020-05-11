@@ -8,22 +8,21 @@ env:
     - AWS_DEFAULT_REGION=$AWS_REGION
 install:
   - pip3 install --user pre-commit cloudformation-cli-java-plugin
+before_script:
+  - pre-commit run --all-files --verbose
 jobs:
   include:
     - script:
-        - pre-commit run --all-files --verbose
         - cd "$TRAVIS_BUILD_DIR/aws-macie-customdataidentifier"
         - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B clean verify
       after_failure:
         - cat "$TRAVIS_BUILD_DIR/aws-macie-customdataidentifier/rpdk.log"
     - script:
-        - pre-commit run --all-files --verbose
         - cd "$TRAVIS_BUILD_DIR/aws-macie-findingsfilter"
         - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B clean verify
       after_failure:
         - cat "$TRAVIS_BUILD_DIR/aws-macie-findingsfilter/rpdk.log"
     - script:
-        - pre-commit run --all-files --verbose
         - cd "$TRAVIS_BUILD_DIR/aws-macie-session"
         - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B clean verify
       after_failure:
