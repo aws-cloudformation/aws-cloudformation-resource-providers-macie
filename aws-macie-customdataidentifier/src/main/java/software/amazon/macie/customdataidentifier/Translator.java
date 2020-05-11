@@ -1,7 +1,6 @@
 package software.amazon.macie.customdataidentifier;
 
 import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierRequest;
-import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierResponse;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.GetCustomDataIdentifierResponse;

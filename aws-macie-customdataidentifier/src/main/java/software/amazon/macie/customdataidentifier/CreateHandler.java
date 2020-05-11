@@ -1,5 +1,6 @@
 package software.amazon.macie.customdataidentifier;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.CreateCustomDataIdentifierResponse;
@@ -14,6 +15,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 public class CreateHandler extends BaseHandlerStd {
 
     private Logger logger;
+    private ResourceHandlerRequest<ResourceModel> request;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
@@ -23,6 +25,7 @@ public class CreateHandler extends BaseHandlerStd {
         final Logger logger
     ) {
         this.logger = logger;
+        this.request = request;
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -51,18 +54,19 @@ public class CreateHandler extends BaseHandlerStd {
      * Implement client invocation of the create request through the proxyClient, which is already initialised with
      * caller credentials, correct region and retry settings
      *
-     * @param request the aws service request to create a resource
+     * @param createCustomDataIdentifierRequest the aws service request to create a resource
      * @param proxyClient the aws service client to make the call
      * @return create resource response
      */
     private CreateCustomDataIdentifierResponse createResource(
-        final CreateCustomDataIdentifierRequest request,
+        final CreateCustomDataIdentifierRequest createCustomDataIdentifierRequest,
         final ProxyClient<Macie2Client> proxyClient
     ) {
         CreateCustomDataIdentifierResponse response;
         try {
-            response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::createCustomDataIdentifier);
+            response = proxyClient.injectCredentialsAndInvokeV2(createCustomDataIdentifierRequest, proxyClient.client()::createCustomDataIdentifier);
         } catch (final Macie2Exception e) {
+            logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
 

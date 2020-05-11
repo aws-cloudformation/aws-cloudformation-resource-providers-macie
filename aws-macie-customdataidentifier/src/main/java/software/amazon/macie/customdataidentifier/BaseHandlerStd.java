@@ -10,6 +10,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 // Placeholder for the functionality that could be shared across Create/Read/Update/Delete/List Handlers
 
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
+  protected final static String EXCEPTION_MESSAGE = "Exception occurred for AWS account id [%s]. Exception message: %s";
   @Override
   public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
     final AmazonWebServicesClientProxy proxy,

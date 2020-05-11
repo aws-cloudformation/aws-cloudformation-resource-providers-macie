@@ -1,5 +1,6 @@
 package software.amazon.macie.customdataidentifier;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import software.amazon.awssdk.services.macie2.Macie2Client;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierRequest;
 import software.amazon.awssdk.services.macie2.model.DeleteCustomDataIdentifierResponse;
@@ -15,6 +16,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class DeleteHandler extends BaseHandlerStd {
     private Logger logger;
+    private ResourceHandlerRequest<ResourceModel> request;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
@@ -24,6 +26,7 @@ public class DeleteHandler extends BaseHandlerStd {
         final Logger logger
     ) {
         this.logger = logger;
+        this.request = request;
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -47,20 +50,22 @@ public class DeleteHandler extends BaseHandlerStd {
     /**
      * Implement client invocation of the delete request through the proxyClient, which is already initialised with
      * caller credentials, correct region and retry settings
-     * @param request the aws service request to delete a resource
+     * @param deleteCustomDataIdentifierRequest the aws service request to delete a resource
      * @param proxyClient the aws service client to make the call
      * @return delete resource response
      */
     private DeleteCustomDataIdentifierResponse deleteResource(
-        final DeleteCustomDataIdentifierRequest request,
+        final DeleteCustomDataIdentifierRequest deleteCustomDataIdentifierRequest,
         final ProxyClient<Macie2Client> proxyClient
     ) {
         DeleteCustomDataIdentifierResponse response;
         try {
-            response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::deleteCustomDataIdentifier);
+            response = proxyClient.injectCredentialsAndInvokeV2(deleteCustomDataIdentifierRequest, proxyClient.client()::deleteCustomDataIdentifier);
         } catch (final ResourceNotFoundException e) {
+            logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage()); // CloudFormation catches this exception and quietly succeeds
         } catch (final Macie2Exception e) {
+            logger.log(String.format(EXCEPTION_MESSAGE, request.getAwsAccountId(), ExceptionUtils.getStackTrace(e)));
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
 

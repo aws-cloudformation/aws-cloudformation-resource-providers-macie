@@ -16,7 +16,8 @@ public class UpdateHandler extends BaseHandlerStd {
         final ProxyClient<Macie2Client> proxyClient,
         final Logger logger
     ) {
-        logger.log(String.format("%s does not have an update handler.", ResourceModel.TYPE_NAME));
+        logger.log(String
+            .format("Exception occurred for AWS account id [%s]. %s does not have an update handler.", request.getAwsAccountId(), ResourceModel.TYPE_NAME));
         throw new CfnInvalidRequestException(ResourceModel.TYPE_NAME);
     }
 }
