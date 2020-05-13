@@ -23,11 +23,11 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "macie:CreateFindingsFilter"
-                - "macie:DeleteFindingsFilter"
-                - "macie:GetFindingsFilter"
-                - "macie:ListFindingsFilters"
-                - "macie:UpdateFindingsFilter"
+                - "macie2:CreateFindingsFilter"
+                - "macie2:DeleteFindingsFilter"
+                - "macie2:GetFindingsFilter"
+                - "macie2:ListFindingsFilters"
+                - "macie2:UpdateFindingsFilter"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
