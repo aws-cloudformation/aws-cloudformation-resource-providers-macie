@@ -110,6 +110,10 @@
       }
     }
   },
+  "required": [
+    "Name",
+    "FindingCriteria"
+  ],
   "additionalProperties": false,
   "readOnlyProperties": [
     "/properties/Id",
