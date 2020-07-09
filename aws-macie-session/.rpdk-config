@@ -10,6 +10,7 @@
             "amazon",
             "macie",
             "session"
-        ]
+        ],
+        "protocolVersion": "2.0.0"
     }
 }
