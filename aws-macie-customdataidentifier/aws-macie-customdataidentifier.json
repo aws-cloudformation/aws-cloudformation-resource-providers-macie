@@ -99,6 +99,9 @@
       "permissions": [
         "macie2:ListCustomDataIdentifiers"
       ]
+    },
+    "update": {
+      "permissions": []
     }
   }
 }
